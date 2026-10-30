@@ -2,17 +2,19 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0f1115">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Rutina">
 <title>Rutina Mancuernas · Piloto</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0f1115;--card:#181b22;--line:#2a2f3a;--txt:#e9ecf2;--mut:#8a93a6;--acc:#ff6b2c;--ok:#2ecc71}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--txt);padding:16px;max-width:760px;margin:auto}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--txt);padding:16px 16px 110px;max-width:760px;margin:auto;-webkit-tap-highlight-color:transparent}
 h1{font-size:22px;font-weight:800}h1 span{color:var(--acc)}
 .sub{color:var(--mut);font-size:13px;margin:4px 0 16px}
 .row{display:flex;gap:8px;flex-wrap:wrap}
@@ -35,7 +37,7 @@ h1{font-size:22px;font-weight:800}h1 span{color:var(--acc)}
 .exm{font-size:12px;color:var(--mut);margin-top:3px}
 .rx{font-size:13px;margin-top:4px}.rx b{color:var(--acc)}
 .sets{display:flex;gap:5px}
-.set{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--mut);cursor:pointer;font:600 12px Inter}
+.set{width:40px;height:40px;border-radius:12px;font-size:14px !important;border:1px solid var(--line);background:transparent;color:var(--mut);cursor:pointer;font:600 12px Inter}
 .set.done{background:var(--ok);border-color:var(--ok);color:#06210f}
 .tag{font-size:11px;background:#2a1a12;color:var(--acc);padding:3px 8px;border-radius:6px;font-weight:600}
 .note{font-size:12px;color:var(--mut);line-height:1.5}
@@ -58,27 +60,46 @@ label{font-size:12px;color:var(--mut)}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
 .stats div{background:#11141a;border-radius:10px;padding:10px 4px}.stats b{display:block;font-size:20px;color:var(--acc)}.stats span{font-size:11px;color:var(--mut)}
 .lg{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-top:1px solid var(--line)}
+.nav{position:fixed;left:0;right:0;bottom:0;background:#12151bee;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 0 calc(10px + env(safe-area-inset-bottom));z-index:8}
+.nav button{background:none;border:0;color:var(--mut);font:600 11px Inter;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 18px;border-radius:12px;cursor:pointer}
+.nav button span{font-size:22px;filter:grayscale(1);opacity:.6}
+.nav button.on{color:var(--acc)}.nav button.on span{filter:none;opacity:1}
+.view{display:none}.view.on{display:block;animation:fd .25s}
+@keyframes fd{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.av{width:40px;height:40px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-weight:800;cursor:pointer}
+.hero{display:flex;gap:16px;align-items:center;background:linear-gradient(135deg,#2a1608,#181b22 60%);border:1px solid #3a2414}
+.hero h2{font-size:22px;line-height:1.15}
+.restbar{position:fixed;left:12px;right:12px;bottom:calc(78px + env(safe-area-inset-bottom));max-width:736px;margin:auto;background:#1f2a22;border:1px solid var(--ok);border-radius:16px;padding:12px 14px;display:none;align-items:center;gap:12px;z-index:7;box-shadow:0 10px 30px #0008}
+.restbar.on{display:flex;animation:fd .2s}.restbar.end{background:#3a1d0f;border-color:var(--acc)}
+.restbar .tm{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;min-width:78px}
+.restbar button{background:#ffffff14;border:0;color:var(--txt);border-radius:10px;padding:10px 12px;font:700 13px Inter;cursor:pointer}
 .rest{text-align:center;padding:30px 10px;color:var(--mut)}
 </style>
 </head>
 <body>
-<h1>💪 Rutina <span>Mancuernas</span></h1>
-<p class="sub">Programa piloto · Grupo Llanterama · Toca el nombre de cada ejercicio para ver cómo se hace</p>
-
-<div class="row" id="users"></div>
-<div class="card" id="profile"></div>
-<div class="row days" id="days"></div>
-<div class="card" id="workout"></div>
-<div class="card" id="hist"></div>
-<div class="card note">
-<b style="color:var(--txt)">Reglas del programa</b><br>
-• Calienta 5 min (movilidad de hombros, sentadillas sin peso, saltos suaves).<br>
-• Elige un peso con el que las últimas 2 reps cuesten trabajo pero con buena técnica.<br>
-• Cuando completes todas las series y reps 2 sesiones seguidas, sube el peso (1–2 kg).<br>
-• El abdomen se marca con la dieta: déficit moderado de calorías + proteína en cada comida.<br>
-• Duerme 7–8 h. Si hay dolor articular (no muscular), para y ajusta.
-</div>
-
+<div class="top"><div><h1>💪 Rutina <span>Fit</span></h1><p class="sub" id="greet" style="margin:2px 0 0"></p></div><div class="av" id="av"></div></div>
+<section class="view on" id="v-hoy">
+ <div class="card hero" id="hero"></div>
+ <div class="row days" id="days"></div>
+ <div class="card" id="workout"></div>
+</section>
+<section class="view" id="v-prog"><div class="card" id="hist"></div></section>
+<section class="view" id="v-perfil">
+ <div class="row" id="users"></div>
+ <div class="card" id="profile"></div>
+ <div class="card note">
+ <b style="color:var(--txt)">Reglas del programa</b><br>
+ • Calienta 5 min (movilidad de hombros, sentadillas sin peso, saltos suaves).<br>
+ • Elige un peso con el que las últimas 2 reps cuesten trabajo pero con buena técnica.<br>
+ • Cuando completes todas las series y reps 2 sesiones seguidas, sube el peso (1–2 kg).<br>
+ • El abdomen se marca con la dieta: déficit moderado de calorías + proteína en cada comida.<br>
+ • Duerme 7–8 h. Si hay dolor articular (no muscular), para y ajusta.
+ </div>
+</section>
+<div class="restbar" id="restbar"><div><div class="note">Descanso</div><div class="tm" id="rtm">0:00</div></div>
+ <div style="flex:1"></div><button id="rm">−15</button><button id="rp">+15</button><button id="rs" style="background:var(--ok);color:#06210f">Saltar</button></div>
+<nav class="nav"><button class="on" data-v="hoy"><span>🏋️</span>Hoy</button><button data-v="prog"><span>📈</span>Progreso</button><button data-v="perfil"><span>👤</span>Perfil</button></nav>
 <div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
 
 <script>
@@ -207,10 +228,45 @@ const weekKey=()=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-
 users.forEach(u=>{if(u.id==="cesar"&&!u.mode){u.mode="gym";u.lumbar=true}});
 function U(){return users.find(u=>u.id===cur)||users[0]}
 function reps(row,u){return row.length>3&&u.k==="o"?row[3]:row[2]}
-function plan(){const u=U();
- if(u.mode==="gym")return PLAN_GYM;
- if(!u.lumbar)return PLAN;
- return PLAN.map(p=>({...p,x:p.x.map(r=>LUMBAR_SUB[r[0]]?[LUMBAR_SUB[r[0]],...r.slice(1)]:r)}));}
+// ===== Fases mensuales =====
+const PHASES=[
+ {n:"Base",ic:"🧱",d:"Aprender técnica, peso moderado",reps:{c:"12-15",o:"15"},plus:0},
+ {n:"Volumen",ic:"📈",d:"Más series y variantes para crecer",reps:{c:"8-12",o:"12-15"},plus:1,swap:true},
+ {n:"Fuerza",ic:"💥",d:"Más peso, menos repeticiones, descansos de 2 min",reps:{c:"6-8",o:"10-12"},plus:0},
+ {n:"Descarga",ic:"🧘",d:"Semana ligera para recuperarse",reps:{c:"12",o:"12"},half:true,weeks:1}
+];
+const META_DIAS=12, SEMANAS=4;
+const SWAP={curl:"martillo",martillo:"curl",press:"inclinado",inclinado:"press",polea:"remosent",remosent:"polea",aperturas:"pullover",pullover:"aperturas",predicador:"concentrado",concentrado:"predicador"};
+function phaseRow(r,ph,u){
+ let [id,se,rp]=[r[0],r[1],reps(r,u)];
+ const keep=/s$|min|máx/.test(rp)||se===1;
+ const suf=(rp.match(/ c\/[lp]$/)||[""])[0];
+ if(ph.swap&&SWAP[id])id=SWAP[id];
+ if(!keep){rp=ph.reps[u.k==="o"?"o":"c"]+suf;se=se+ph.plus}
+ if(ph.half)se=Math.max(1,Math.ceil(se/2));
+ return [id,se,rp];
+}
+function plan(){const u=U();ensurePhase(u);const ph=PHASES[u.phase];
+ let base=u.mode==="gym"?PLAN_GYM:PLAN;
+ return base.map(p=>{const seen=new Set();return {...p,x:p.x.map(r=>{
+   let row=phaseRow(r,ph,u);
+   if(u.lumbar&&u.mode!=="gym"&&LUMBAR_SUB[row[0]])row=[LUMBAR_SUB[row[0]],row[1],row[2]];
+   return row}).filter(r=>!seen.has(r[0])&&seen.add(r[0]))}});}
+function mondayISO(d){d=new Date(d);d.setHours(12);d.setDate(d.getDate()-((d.getDay()+6)%7));return d.toISOString().slice(0,10)}
+function ensurePhase(u){if(u.phase==null){u.phase=0;u.cycle=1;u.pstart=mondayISO(new Date());store.set("mc_users",users)}}
+function phaseStatus(u){ensurePhase(u);const ph=PHASES[u.phase],L=(typeof LOG!=="undefined"&&LOG[u.id])||{};
+ const weeks=Math.floor((Date.now()-new Date(u.pstart+"T00:00:00"))/6048e5);
+ const need=ph.weeks||SEMANAS, days=Object.entries(L).filter(([k,e])=>k>=u.pstart&&e.ok/e.tot>=.8).length;
+ const meta=ph.weeks?0:META_DIAS;
+ return {ph,weeks,need,days,meta,ready:weeks>=need&&days>=meta,late:weeks>=need&&days<meta};}
+function checkAdvance(){const u=U(),s=phaseStatus(u);if(!s.ready)return;
+ const old=s.ph.n;u.phase=u.phase===3?1:u.phase+1;if(u.phase===1&&old==="Descarga")u.cycle++;
+ u.pstart=mondayISO(new Date());store.set("mc_users",users);
+ const np=PHASES[u.phase];
+ document.getElementById("sheet").innerHTML=`<div style="text-align:center;padding:10px"><div style="font-size:54px">🏆</div><h3>¡Fase ${old} superada!</h3>
+ <p class="note" style="margin:8px 0">${u.n}, cumpliste tus objetivos. Se desbloqueó tu nueva rutina:</p>
+ <h2 style="color:var(--acc)">${np.ic} ${np.n}</h2><p class="note">${np.d}</p><button class="btn" id="cls">¡Vamos!</button></div>`;
+ document.getElementById("modal").classList.add("open");document.getElementById("cls").onclick=closeEx;}
 
 function renderUsers(){
  const el=document.getElementById("users");
@@ -226,6 +282,13 @@ function renderProfile(){
  <div class="goal">🎯 ${u.g}</div><div class="goal" style="color:var(--mut)">Enfoque: ${perfil}</div>
  <div class="row" style="margin-top:10px"><button class="chip ${u.mode!=="gym"?"on":""}" data-m="casa">🏠 Casa (mancuernas)</button><button class="chip ${u.mode==="gym"?"on":""}" data-m="gym">🏋️ Gimnasio</button>
  <button class="chip ${u.lumbar?"on":""}" id="lum">🛡️ Cuidar lumbar</button></div>
+${(()=>{const s=phaseStatus(u),wk=Math.min(s.weeks+1,s.need);
+  return `<div style="margin-top:12px;background:#11141a;border-radius:10px;padding:10px">
+  <div class="dayh" style="margin:0"><b>${s.ph.ic} Fase ${s.ph.n}</b><span class="tag">Ciclo ${u.cycle} · Sem ${wk}/${s.need}</span></div>
+  <div class="note">${s.ph.d}</div>
+  ${s.meta?`<div class="bar"><i style="width:${Math.min(100,s.days/s.meta*100)}%"></i></div><div class="note">Días cumplidos en esta fase: <b style="color:var(--txt)">${s.days}/${s.meta}</b> · mínimo ${s.need} semanas</div>`:`<div class="note">Al terminar la semana regresas a Volumen con más peso.</div>`}
+  ${s.late?`<div class="note" style="color:#ffb347;margin-top:4px">⏳ Ya pasaron ${s.need} semanas: te faltan ${s.meta-s.days} días cumplidos para desbloquear la siguiente fase.</div>`:""}
+  <div class="note" style="margin-top:6px">Ruta: ${PHASES.map((p,i)=>`<span style="color:${i===u.phase?"var(--acc)":i<u.phase?"var(--ok)":"var(--mut)"}">${p.n}</span>`).join(" → ")}</div></div>`})()}
  ${u.mode==="gym"?'<div class="note" style="margin-top:6px">Plan de gimnasio con máquinas y poleas: sin sentadilla con barra ni peso muerto.</div>':''}`;
  document.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{u.mode=b.dataset.m;store.set("mc_users",users);render()});
  document.getElementById("lum").onclick=()=>{u.lumbar=!u.lumbar;store.set("mc_users",users);render()};
@@ -250,7 +313,7 @@ function renderWorkout(){
  ${u.k==="o"&&!p.circ?'<p class="note">➕ Al terminar: 12 min de caminata rápida o bici (ayuda a bajar abdomen).</p>':''}
  <div class="bar"><i style="width:${pct}%"></i></div><div class="note" style="margin-bottom:6px">${ok}/${tot} series · ${pct}% ${pct===100?"🔥 ¡Día completo!":""}</div>${rows}`;
  el.querySelectorAll(".exn").forEach(n=>n.onclick=()=>openEx(n.dataset.e));
- el.querySelectorAll(".set").forEach(b=>b.onclick=()=>{const k=key(b.dataset.i);const a=done[k]||[];a[b.dataset.s]=!a[b.dataset.s];done[k]=a;store.set("mc_done",done);renderWorkout();renderHist()});
+ el.querySelectorAll(".set").forEach(b=>b.onclick=()=>{const k=key(b.dataset.i);const a=done[k]||[];a[b.dataset.s]=!a[b.dataset.s];if(a[b.dataset.s]){startRest();try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}}done[k]=a;store.set("mc_done",done);renderWorkout();renderHist();renderTop();const pb=U().phase;checkAdvance();if(U().phase!==pb)render()});
 }
 
 // ===== Muñequito animado haciendo el ejercicio =====
@@ -405,7 +468,30 @@ function renderHist(){
  <div style="margin-top:10px">${all.slice(0,7).map(([k,e])=>`<div class="lg"><span>${new Date(k+"T12:00:00").toLocaleDateString("es-MX",{weekday:"short",day:"numeric",month:"short"})} · ${e.t}</span><span style="color:${done(e)?"var(--ok)":"#ffb347"}">${pct(e)}%</span></div>`).join("")||'<div class="note">Aún no hay registros. ¡Palomea tu primera serie!</div>'}</div>
  <div class="note" style="margin-top:8px">Un día cuenta como cumplido con 80% o más de las series. El domingo de descanso no rompe la racha.</div>`;
 }
-function render(){renderUsers();renderProfile();renderDays();renderWorkout();renderHist()}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("on",x===b));
+ document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on",v.id==="v-"+b.dataset.v));window.scrollTo(0,0);try{navigator.vibrate&&navigator.vibrate(8)}catch(e){}});
+function renderTop(){const u=U(),h=new Date().getHours();
+ document.getElementById("greet").textContent=(h<12?"Buenos días":h<19?"Buenas tardes":"Buenas noches")+", "+u.n+" 👋";
+ const av=document.getElementById("av");av.textContent=u.n[0];av.onclick=()=>document.querySelector('[data-v="perfil"]').click();
+ const p=plan()[day],s=phaseStatus(u);let ok=0,tot=0;p.x.forEach((r,i)=>{tot+=r[1];ok+=(done[key(i)]||[]).filter(Boolean).length});
+ const pct=tot?ok/tot:0,C=2*Math.PI*34;
+ document.getElementById("hero").innerHTML=`<svg width="86" height="86" viewBox="0 0 86 86"><circle cx="43" cy="43" r="34" fill="none" stroke="#2a2f3a" stroke-width="9"/>
+ <circle cx="43" cy="43" r="34" fill="none" stroke="${pct>=.8?"#2ecc71":"#ff6b2c"}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct)}" transform="rotate(-90 43 43)" style="transition:.4s"/>
+ <text x="43" y="49" text-anchor="middle" fill="#e9ecf2" font-size="18" font-weight="800" font-family="Inter">${p.rest?"😴":Math.round(pct*100)+"%"}</text></svg>
+ <div><div class="note">${["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"][day]} · ${s.ph.ic} Fase ${s.ph.n}</div><h2>${p.t}</h2>
+ <div class="note">${p.rest?"Día de recuperación":`${p.x.length} ejercicios · ${tot} series · ~${Math.round(tot*1.8)} min`}</div></div>`;}
+// ===== Temporizador de descanso =====
+let rT=null,rLeft=0;
+function restSecs(){const u=U(),ph=phaseStatus(u).ph.n;return ph==="Fuerza"?120:u.k==="o"?50:75}
+function beep(){try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=880;o.connect(g);g.connect(a.destination);g.gain.value=.15;o.start();o.stop(a.currentTime+.35)}catch(e){}}
+function showRest(){const b=document.getElementById("restbar");document.getElementById("rtm").textContent=Math.floor(Math.max(rLeft,0)/60)+":"+String(Math.max(rLeft,0)%60).padStart(2,"0");b.classList.toggle("end",rLeft<=0)}
+function startRest(){clearInterval(rT);rLeft=restSecs();document.getElementById("restbar").classList.add("on");showRest();
+ rT=setInterval(()=>{rLeft--;showRest();if(rLeft===0){beep();try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}}if(rLeft<-20)stopRest()},1000)}
+function stopRest(){clearInterval(rT);document.getElementById("restbar").classList.remove("on")}
+document.getElementById("rm").onclick=()=>{rLeft=Math.max(0,rLeft-15);showRest()};
+document.getElementById("rp").onclick=()=>{rLeft+=15;showRest()};
+document.getElementById("rs").onclick=stopRest;
+function render(){checkAdvance();renderTop();renderUsers();renderProfile();renderDays();renderWorkout();renderHist()}
 render();
 if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js")}catch(e){}}
 </script>
