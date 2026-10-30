@@ -74,10 +74,20 @@ label{font-size:12px;color:var(--mut)}
 .restbar.on{display:flex;animation:fd .2s}.restbar.end{background:#3a1d0f;border-color:var(--acc)}
 .restbar .tm{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;min-width:78px}
 .restbar button{background:#ffffff14;border:0;color:var(--txt);border-radius:10px;padding:10px 12px;font:700 13px Inter;cursor:pointer}
+.pick{position:fixed;inset:0;background:radial-gradient(circle at 50% 0%,#2a1608,var(--bg) 60%);z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;animation:fd .3s}
+.pick.off{display:none}
+.pick h1{font-size:28px;text-align:center}.pick .sub{text-align:center;margin-bottom:26px}
+.pgrid{display:grid;grid-template-columns:repeat(2,minmax(120px,160px));gap:14px}
+.pc{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 10px;text-align:center;cursor:pointer;color:var(--txt);font:inherit;transition:.15s}
+.pc:active{transform:scale(.96)}.pc:hover{border-color:var(--acc)}
+.pc .big{width:64px;height:64px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;background:var(--acc)}
+.pc b{display:block;font-size:16px}.pc small{color:var(--mut);font-size:12px}
+.pc.new{border-style:dashed}.pc.new .big{background:transparent;border:2px dashed var(--line);color:var(--mut)}
 .rest{text-align:center;padding:30px 10px;color:var(--mut)}
 </style>
 </head>
 <body>
+<div class="pick" id="pick"><div style="font-size:40px">💪</div><h1>¿Quién va a entrenar?</h1><p class="sub">Elige tu perfil</p><div class="pgrid" id="pgrid"></div></div>
 <div class="top"><div><h1>💪 Rutina <span>Fit</span></h1><p class="sub" id="greet" style="margin:2px 0 0"></p></div><div class="av" id="av"></div></div>
 <section class="view on" id="v-hoy">
  <div class="card hero" id="hero"></div>
@@ -472,7 +482,7 @@ document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{document.quer
  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on",v.id==="v-"+b.dataset.v));window.scrollTo(0,0);try{navigator.vibrate&&navigator.vibrate(8)}catch(e){}});
 function renderTop(){const u=U(),h=new Date().getHours();
  document.getElementById("greet").textContent=(h<12?"Buenos días":h<19?"Buenas tardes":"Buenas noches")+", "+u.n+" 👋";
- const av=document.getElementById("av");av.textContent=u.n[0];av.onclick=()=>document.querySelector('[data-v="perfil"]').click();
+ const av=document.getElementById("av");av.textContent=u.n[0];av.style.background=COLORS[users.indexOf(u)%6];av.title="Cambiar perfil";av.onclick=showPicker;
  const p=plan()[day],s=phaseStatus(u);let ok=0,tot=0;p.x.forEach((r,i)=>{tot+=r[1];ok+=(done[key(i)]||[]).filter(Boolean).length});
  const pct=tot?ok/tot:0,C=2*Math.PI*34;
  document.getElementById("hero").innerHTML=`<svg width="86" height="86" viewBox="0 0 86 86"><circle cx="43" cy="43" r="34" fill="none" stroke="#2a2f3a" stroke-width="9"/>
@@ -491,8 +501,17 @@ function stopRest(){clearInterval(rT);document.getElementById("restbar").classLi
 document.getElementById("rm").onclick=()=>{rLeft=Math.max(0,rLeft-15);showRest()};
 document.getElementById("rp").onclick=()=>{rLeft+=15;showRest()};
 document.getElementById("rs").onclick=stopRest;
+const COLORS=["#ff6b2c","#3b82f6","#a855f7","#14b8a6","#eab308","#ec4899"];
+function showPicker(){stopRest();const g=document.getElementById("pgrid");
+ g.innerHTML=users.map((u,i)=>{const s=phaseStatus(u);return `<button class="pc" data-p="${u.id}"><div class="big" style="background:${COLORS[i%6]}">${u.n[0]}</div><b>${u.n}</b><small>${s.ph.ic} Fase ${s.ph.n} · ${u.mode==="gym"?"Gimnasio":"Casa"}</small></button>`}).join("")+
+ `<button class="pc new" id="pnew"><div class="big">+</div><b>Nuevo</b><small>Agregar perfil</small></button>`;
+ g.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{cur=b.dataset.p;store.set("mc_cur",cur);day=(new Date().getDay()+6)%7;
+  document.getElementById("pick").classList.add("off");document.querySelector('[data-v="hoy"]').click();render();try{navigator.vibrate&&navigator.vibrate(10)}catch(e){}});
+ document.getElementById("pnew").onclick=()=>{document.getElementById("pick").classList.add("off");addUser()};
+ document.getElementById("pick").classList.remove("off");}
 function render(){checkAdvance();renderTop();renderUsers();renderProfile();renderDays();renderWorkout();renderHist()}
 render();
+showPicker();
 if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js")}catch(e){}}
 </script>
 </body>
