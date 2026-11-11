@@ -117,6 +117,13 @@ table.adm td{padding:8px 4px;border-bottom:1px solid var(--line)}
 details.info{background:var(--card2);border-radius:12px;padding:10px 12px;margin:8px 0}details.info summary{font-weight:700;font-size:13.5px;cursor:pointer}details.info p{font-size:13px;line-height:1.5;margin-top:6px;color:#cfd5e1}
 .rk{display:flex;gap:10px;align-items:center;padding:11px 4px;border-top:1px solid var(--line)}.rk:first-child{border-top:0}.rk.me{background:#2a160866;border-radius:12px}.pos{width:28px;text-align:center;font-weight:900;font-size:18px}.pct{font-weight:900;font-size:17px}
 .nav button{padding:6px 6px!important}
+.anat{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#141821;border-radius:14px;padding:10px 18px;margin:12px 0 8px}
+.anat>div{text-align:center}.anat small{font-size:10px;color:var(--mut);font-weight:700;letter-spacing:1px}
+.mleg{display:flex;flex-direction:column;gap:4px;font-size:12.5px;margin-bottom:6px}.mleg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.thumb{background:#141821!important;display:flex;align-items:center;justify-content:center}
+.meme{font-size:12px;color:#cfd5e1;font-style:italic;margin-top:4px;line-height:1.35}
+.dato{margin-top:10px;padding-top:9px;border-top:1px solid #2b3a55;font-size:12.5px;color:#b9c3d6;line-height:1.45}.dato b{color:#8fb4ff;font-size:11.5px}
+.sci a{color:var(--txt);text-decoration:none}.sci .lg span:first-child{color:var(--acc);font-weight:700;min-width:84px}
 .rest{text-align:center;padding:24px 10px;color:var(--mut)}
 .link{background:none;border:0;color:var(--mut);font:600 13px Inter;cursor:pointer;text-decoration:underline;margin-top:22px}
 </style>
@@ -147,6 +154,7 @@ details.info{background:var(--card2);border-radius:12px;padding:10px 12px;margin
   <div class="card hero" id="hero"></div>
   <div class="week" id="week"></div>
   <div class="card" id="workout"></div>
+  <div class="card" id="habits"></div>
  </section>
  <section class="view" id="v-prog"></section>
  <section class="view" id="v-rank"></section>
@@ -428,44 +436,66 @@ Object.assign(POSES,{
  invrow:{b:{hd:[56,106],sh:[70,112],el:[72,86],ha:[74,64],hp:[112,128],kn:[136,138],ft:[160,148]},A:{},B:{hd:[58,84],sh:[72,92],el:[58,78],hp:[112,118],kn:[136,132]},hl:["to","ua"],p:["table"]},
  climber:{b:{hd:[150,96],sh:[136,104],el:[136,126],ha:[136,148],hp:[90,116],kn:[66,128],ft:[42,140]},A:{},B:{kn:[118,118],ft:[104,140]},hl:["to","th"],p:[]}
 });
+Object.assign(POSES,{
+ lunge:{b:{hd:[100,30],sh:[100,46],el:[100,70],ha:[104,94],hp:[100,94],kn:[112,122],ft:[118,150],fk:[90,122],ff:[80,150]},A:{},
+  B:{hd:[98,50],sh:[98,66],el:[98,90],ha:[102,114],hp:[98,114],kn:[124,118],ft:[118,150],fk:[84,140],ff:[66,148]},p:["db"]},
+ bulg:{b:{hd:[104,28],sh:[102,44],el:[104,68],ha:[106,92],hp:[100,92],kn:[112,120],ft:[116,150],fk:[84,118],ff:[64,104]},A:{},
+  B:{hd:[100,48],sh:[98,64],el:[100,88],ha:[102,112],hp:[96,112],kn:[122,118],fk:[78,138]},p:["chair","db"]},
+ step:{b:{hd:[96,30],sh:[96,46],el:[96,70],ha:[100,94],hp:[96,94],kn:[118,98],ft:[122,118],fk:[96,122],ff:[94,150]},A:{},
+  B:{hd:[112,12],sh:[112,28],el:[112,52],ha:[116,76],hp:[112,76],kn:[118,98],fk:[106,100],ff:[102,122]},p:["box","db"]},
+ row1:{b:{hd:[140,64],sh:[128,70],el:[128,96],ha:[128,120],hp:[86,82],kn:[90,118],ft:[88,150],fe:[140,94],fh:[146,118]},A:{},B:{el:[108,76],ha:[112,102]},p:["db","box2"]},
+ kickback:{b:{hd:[150,84],sh:[136,92],el:[136,118],ha:[136,146],hp:[90,98],kn:[92,140],ft:[62,144],fk:[92,140],ff:[62,144]},A:{},B:{kn:[64,90],ft:[44,64]},p:["towel2"]},
+ gkick:{b:{hd:[108,32],sh:[104,48],el:[118,62],ha:[132,58],hp:[98,94],kn:[100,122],ft:[100,150],fk:[100,122],ff:[100,150]},A:{},B:{kn:[78,116],ft:[58,132]},p:["post"],c:[30,146]},
+ climber:{b:{hd:[150,96],sh:[136,104],el:[136,126],ha:[136,148],hp:[90,116]},A:{kn:[66,128],ft:[42,140],fk:[118,118],ff:[104,140]},B:{kn:[118,118],ft:[104,140],fk:[66,128],ff:[42,140]},p:[]},
+ bike:{b:{...SEAT,el:[112,84],ha:[132,76]},A:{kn:[124,96],ft:[116,132],fk:[116,114],ff:[138,142]},B:{kn:[116,114],ft:[138,142],fk:[124,96],ff:[116,132]},p:["seat","bike"]},
+ farmer:{b:S,A:{kn:[110,122],ft:[114,150],fk:[94,122],ff:[88,150]},B:{kn:[94,122],ft:[88,150],fk:[110,122],ff:[114,150]},p:["db"]},
+ deadbug:{b:FLOOR,A:{el:[62,122],ha:[62,100],kn:[110,118],ft:[132,118],fe:[44,128],fh:[24,134],fk:[132,134],ff:[160,140]},
+  B:{el:[44,128],ha:[24,134],kn:[132,134],ft:[160,140],fe:[62,122],fh:[62,100],fk:[110,118],ff:[132,118]},p:[]}
+});
+EX.bulgara.f="bulg";EX.stepup.f="step";EX.remo.f="row1";EX.zancada.f="lunge";
 let figRAF=null;
 const SKIN="#f2c49b",SKIN2="#b98a64",SHIRT="#3d72c4",SHIRT2="#28508f",SHORT="#2b313d",OUT="#0b0d11",HL="#ff6b2c";
 function figSVG(type,label,w){
  const P=POSES[type]||POSES.curl,A={...P.b,...P.A},B={...A,...P.B};
  return {P,A,B};
 }
-function drawFig(svg,type,label,k){
+function drawFig(svg,type,k,prim,sec){
+ prim=prim||[];sec=sec||[];
  const {P,A,B}=figSVG(type),J={};
- for(const j in A)J[j]=[A[j][0]+(B[j][0]-A[j][0])*k,A[j][1]+(B[j][1]-A[j][1])*k];
- const hl=s=>P.hl.includes(s),uid=svg.id||"t"+Math.random().toString(36).slice(2,7);
- const F=v=>v.toFixed(1);
- // cápsula con grosor distinto en cada extremo (forma de músculo)
- const cap=(a,b,r1,r2,fill,extra)=>{const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
-  const a1=[a[0]+nx*r1,a[1]+ny*r1],a2=[a[0]-nx*r1,a[1]-ny*r1],b1=[b[0]+nx*r2,b[1]+ny*r2],b2=[b[0]-nx*r2,b[1]-ny*r2];
-  return `<path d="M${F(a1[0])} ${F(a1[1])} L${F(b1[0])} ${F(b1[1])} A${r2} ${r2} 0 0 0 ${F(b2[0])} ${F(b2[1])} L${F(a2[0])} ${F(a2[1])} A${r1} ${r1} 0 0 0 ${F(a1[0])} ${F(a1[1])} Z" fill="${fill}" stroke="#0b0d11" stroke-width="2.2" stroke-linejoin="round" ${extra||""}/>`};
- // brillo sobre la extremidad (da volumen)
- const shine=(a,b,r)=>{const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1,nx=-dy/L*r*.45,ny=dx/L*r*.45;
-  return `<line x1="${F(a[0]+nx+dx*.15)}" y1="${F(a[1]+ny+dy*.15)}" x2="${F(b[0]+nx-dx*.15)}" y2="${F(b[1]+ny-dy*.15)}" stroke="#fff" stroke-opacity=".28" stroke-width="${Math.max(1.5,r*.35)}" stroke-linecap="round"/>`};
- const g=n=>`url(#${n}${uid})`;
+ for(const j in A){const b=B[j]||A[j];J[j]=[A[j][0]+(b[0]-A[j][0])*k,A[j][1]+(b[1]-A[j][1])*k]}
+ const uid=(svg.id||"t")+"x",F=v=>(+v).toFixed(1),g=n=>`url(#${n}${uid})`,O="#0b0d11";
+ const st=m=>prim.includes(m)?2:sec.includes(m)?1:0;
+ const geo=(a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1;return {L,ux:dx/L,uy:dy/L,nx:-dy/L,ny:dx/L}};
+ const cap=(a,b,r1,r2,fill,sw)=>{const q=geo(a,b);
+  const a1=[a[0]+q.nx*r1,a[1]+q.ny*r1],a2=[a[0]-q.nx*r1,a[1]-q.ny*r1],b1=[b[0]+q.nx*r2,b[1]+q.ny*r2],b2=[b[0]-q.nx*r2,b[1]-q.ny*r2];
+  return `<path d="M${F(a1[0])} ${F(a1[1])} L${F(b1[0])} ${F(b1[1])} A${r2} ${r2} 0 0 0 ${F(b2[0])} ${F(b2[1])} L${F(a2[0])} ${F(a2[1])} A${r1} ${r1} 0 0 0 ${F(a1[0])} ${F(a1[1])} Z" fill="${fill}" stroke="${O}" stroke-width="${sw||2}" stroke-linejoin="round"/>`};
+ // vientre muscular sobre un lado del segmento (side=-1 frente, +1 atrás)
+ const belly=(a,b,side,r,t0,t1,lvl,far)=>{if(!lvl)return "";const q=geo(a,b),L=q.L;
+  const p1=[a[0]+q.ux*L*t0+side*q.nx*r*.1,a[1]+q.uy*L*t0+side*q.ny*r*.1],p2=[a[0]+q.ux*L*t1+side*q.nx*r*.1,a[1]+q.uy*L*t1+side*q.ny*r*.1];
+  const m=[(p1[0]+p2[0])/2,(p1[1]+p2[1])/2],bul=r*(1.35+(lvl===2?.35*k:.1));
+  const c1=[m[0]+side*q.nx*bul,m[1]+side*q.ny*bul],c2=[m[0]-side*q.nx*r*.45,m[1]-side*q.ny*r*.45];
+  const col=lvl===2?(far?"#9b1c1c":g("mr")):(far?"#9a5a12":g("ms"));
+  return `<path d="M${F(p1[0])} ${F(p1[1])} Q${F(c1[0])} ${F(c1[1])} ${F(p2[0])} ${F(p2[1])} Q${F(c2[0])} ${F(c2[1])} ${F(p1[0])} ${F(p1[1])} Z" fill="${col}" stroke="${O}" stroke-width="1.6" ${lvl===2&&!far?`filter="${g("gl")}"`:""}/>
+  ${!far?`<path d="M${F(p1[0]+(c1[0]-m[0])*.35)} ${F(p1[1]+(c1[1]-m[1])*.35)} Q${F(m[0]+(c1[0]-m[0])*.75)} ${F(m[1]+(c1[1]-m[1])*.75)} ${F(p2[0]+(c1[0]-m[0])*.35)} ${F(p2[1]+(c1[1]-m[1])*.35)}" stroke="#fff" stroke-opacity=".35" stroke-width="1.3" fill="none"/>`:""}`};
  let o=`<defs>
  <radialGradient id="bg${uid}" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="#26304a"/><stop offset="1" stop-color="#141821"/></radialGradient>
- <linearGradient id="sk${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd8b4"/><stop offset=".55" stop-color="#e9b48a"/><stop offset="1" stop-color="#b9805a"/></linearGradient>
- <linearGradient id="skd${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9926b"/><stop offset="1" stop-color="#8a5c3f"/></linearGradient>
- <linearGradient id="sh${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6aa0ef"/><stop offset=".6" stop-color="#3567c0"/><stop offset="1" stop-color="#1f4387"/></linearGradient>
- <linearGradient id="shd${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2c5299"/><stop offset="1" stop-color="#173163"/></linearGradient>
- <linearGradient id="pa${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4b5363"/><stop offset="1" stop-color="#1c2028"/></linearGradient>
- <linearGradient id="pad${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#30353f"/><stop offset="1" stop-color="#15181e"/></linearGradient>
- <linearGradient id="hl${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb07a"/><stop offset=".5" stop-color="#ff6b2c"/><stop offset="1" stop-color="#c2410c"/></linearGradient>
- <radialGradient id="hd${uid}" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#ffe0c2"/><stop offset=".7" stop-color="#e9b48a"/><stop offset="1" stop-color="#b9805a"/></radialGradient>
+ <linearGradient id="sk${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f7cfa9"/><stop offset=".55" stop-color="#dba57c"/><stop offset="1" stop-color="#a8714d"/></linearGradient>
+ <linearGradient id="skd${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b98260"/><stop offset="1" stop-color="#7d5139"/></linearGradient>
+ <linearGradient id="sh${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3d4555"/><stop offset="1" stop-color="#1a1e26"/></linearGradient>
+ <linearGradient id="mr${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7468"/><stop offset=".55" stop-color="#e02424"/><stop offset="1" stop-color="#a11616"/></linearGradient>
+ <linearGradient id="ms${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffcf80"/><stop offset="1" stop-color="#e98a16"/></linearGradient>
+ <radialGradient id="hd${uid}" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#fbd9b8"/><stop offset=".7" stop-color="#dba57c"/><stop offset="1" stop-color="#a8714d"/></radialGradient>
  <linearGradient id="me${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e3e7ee"/><stop offset="1" stop-color="#8d95a5"/></linearGradient>
- <filter id="gl${uid}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
- <filter id="sd${uid}"><feGaussianBlur stdDeviation="2.5"/></filter>
- </defs><rect width="200" height="160" fill="${g("bg")}"/><rect y="151" width="200" height="9" fill="#202634"/><line x1="0" y1="151" x2="200" y2="151" stroke="#2f3747"/>`;
- const pr=P.p,furn="#4a5366",fs='stroke="#0b0d11" stroke-width="1.5"';
+ <filter id="gl${uid}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter id="sd${uid}"><feGaussianBlur stdDeviation="2.5"/></filter></defs>
+ <rect width="200" height="160" fill="${g("bg")}"/><rect y="151" width="200" height="9" fill="#202634"/><line x1="0" y1="151" x2="200" y2="151" stroke="#2f3747"/>`;
+ const pr=P.p,furn="#4a5366",fs=`stroke="${O}" stroke-width="1.5"`;
  if(pr.includes("bench"))o+=`<rect x="34" y="112" width="96" height="7" rx="3" fill="${furn}" ${fs}/><rect x="44" y="119" width="5" height="32" fill="${furn}"/><rect x="116" y="119" width="5" height="32" fill="${furn}"/>`;
  if(pr.includes("benchshort"))o+=`<rect x="26" y="106" width="44" height="8" rx="3" fill="${furn}" ${fs}/><rect x="34" y="114" width="5" height="37" fill="${furn}"/><rect x="58" y="114" width="5" height="37" fill="${furn}"/>`;
  if(pr.includes("seat"))o+=`<rect x="68" y="114" width="42" height="7" rx="3" fill="${furn}" ${fs}/><rect x="72" y="48" width="7" height="68" rx="3" fill="${furn}" ${fs}/><rect x="87" y="121" width="5" height="30" fill="${furn}"/>`;
- if(pr.includes("chair"))o+=`<rect x="54" y="104" width="38" height="7" rx="3" fill="#7a5a3a" ${fs}/><rect x="56" y="111" width="5" height="40" fill="#5e4329"/><rect x="85" y="111" width="5" height="40" fill="#5e4329"/><rect x="54" y="62" width="6" height="44" rx="3" fill="#7a5a3a" ${fs}/>`;
+ if(pr.includes("chair"))o+=`<rect x="54" y="104" width="38" height="7" rx="3" fill="#8a6440" ${fs}/><rect x="56" y="111" width="5" height="40" fill="#5e4329"/><rect x="85" y="111" width="5" height="40" fill="#5e4329"/><rect x="54" y="62" width="6" height="44" rx="3" fill="#8a6440" ${fs}/>`;
+ if(pr.includes("box"))o+=`<rect x="108" y="118" width="44" height="33" rx="3" fill="#8a6440" ${fs}/>`;
+ if(pr.includes("box2"))o+=`<rect x="128" y="120" width="40" height="31" rx="3" fill="${furn}" ${fs}/>`;
  if(pr.includes("wall"))o+=`<rect x="68" y="6" width="12" height="145" fill="#3a4252" ${fs}/>`;
  if(pr.includes("table"))o+=`<rect x="30" y="56" width="84" height="7" rx="2" fill="#8a6440" ${fs}/><rect x="34" y="63" width="5" height="88" fill="#5e4329"/><rect x="106" y="63" width="5" height="88" fill="#5e4329"/>`;
  if(pr.includes("post"))o+=`<rect x="134" y="20" width="10" height="131" rx="3" fill="${furn}" ${fs}/>`;
@@ -475,54 +505,145 @@ function drawFig(svg,type,label,k){
  if(pr.includes("towel2"))o+=`<rect x="78" y="144" width="30" height="7" rx="2" fill="#5eb3e8" ${fs}/>`;
  if(P.c)o+=`<line x1="${P.c[0]}" y1="${P.c[1]}" x2="${F(J.ha[0])}" y2="${F(J.ha[1])}" stroke="#9aa3b5" stroke-width="1.6"/>`;
  o+=`<ellipse cx="${F((J.hp[0]+J.ft[0])/2)}" cy="152" rx="38" ry="4" fill="#000" opacity=".55" filter="${g("sd")}"/>`;
- const far=([x,y])=>[x+6,y-3],gw=`filter="${g("gl")}"`;
- // lado lejano
- o+=cap(far(J.hp),far(J.kn),7,5.5,hl("th")?"#b0491c":g("pad"))+cap(far(J.kn),far(J.ft),5,3.5,hl("sn")?"#b0491c":g("skd"));
- o+=cap(far(J.sh),far(J.el),5.5,4.5,hl("ua")?"#b0491c":g("shd"))+cap(far(J.el),far(J.ha),4.2,3.2,g("skd"));
- // torso con pecho y cintura
- const dx=J.hp[0]-J.sh[0],dy=J.hp[1]-J.sh[1],L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L,ux=dx/L,uy=dy/L;
- const P1=[J.sh[0]+nx*12-ux*3,J.sh[1]+ny*12-uy*3],P2=[J.sh[0]-nx*12-ux*3,J.sh[1]-ny*12-uy*3],P3=[J.hp[0]-nx*8.5,J.hp[1]-ny*8.5],P4=[J.hp[0]+nx*8.5,J.hp[1]+ny*8.5];
- const C1=[(P2[0]+P3[0])/2-nx*3,(P2[1]+P3[1])/2-ny*3],C2=[(P4[0]+P1[0])/2+nx*3,(P4[1]+P1[1])/2+ny*3];
- const tor=`M${F(P1[0])} ${F(P1[1])} Q${F(J.sh[0]-ux*8)} ${F(J.sh[1]-uy*8)} ${F(P2[0])} ${F(P2[1])} Q${F(C1[0])} ${F(C1[1])} ${F(P3[0])} ${F(P3[1])} L${F(P4[0])} ${F(P4[1])} Q${F(C2[0])} ${F(C2[1])} ${F(P1[0])} ${F(P1[1])} Z`;
- o+=`<path d="${tor}" fill="${hl("to")?g("hl"):g("sh")}" stroke="#0b0d11" stroke-width="2.4" stroke-linejoin="round" ${hl("to")?gw:""}/>`;
- o+=`<path d="M${F(J.sh[0]+nx*6+ux*6)} ${F(J.sh[1]+ny*6+uy*6)} Q${F(J.sh[0]+nx*9+ux*18)} ${F(J.sh[1]+ny*9+uy*18)} ${F(J.sh[0]+nx*5+ux*30)} ${F(J.sh[1]+ny*5+uy*30)}" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="3" stroke-linecap="round"/>`;
- // pierna cercana: short + pantorrilla
- o+=cap(J.hp,J.kn,8.5,6.5,hl("th")?g("hl"):g("pa"),hl("th")?gw:"")+shine(J.hp,J.kn,8);
- o+=cap(J.kn,J.ft,6,4,hl("sn")?g("hl"):g("sk"),hl("sn")?gw:"")+shine(J.kn,J.ft,5);
- o+=`<ellipse cx="${F(J.ft[0]+4)}" cy="${F(J.ft[1]+.5)}" rx="9" ry="4" fill="#f4f4f4" stroke="#0b0d11" stroke-width="2"/><path d="M${F(J.ft[0]-4)} ${F(J.ft[1]+3)} h16" stroke="#ff6b2c" stroke-width="2"/>`;
- // cuello y cabeza
+ // articulaciones del lado lejano (independientes si la pose las define)
+ const D=([x,y])=>[x+6,y-3];
+ const fhp=D(J.hp),fsh=D(J.sh),fkn=D(J.fk||J.kn),fft=D(J.ff||J.ft),fel=D(J.fe||J.el),fha=D(J.fh||J.ha);
+ // ---- pierna y brazo lejanos
+ o+=cap(fkn,fft,5,3.6,g("skd"))+cap(fhp,fkn,7.5,5.8,g("skd"));
+ o+=cap(fhp,[fhp[0]+(fkn[0]-fhp[0])*.5,fhp[1]+(fkn[1]-fhp[1])*.5],8,6.8,"#1d2129");
+ o+=belly(fhp,fkn,-1,7,.12,.92,st("cuadriceps")||st("aductores"),1)+belly(fhp,fkn,1,7,.15,.9,st("femoral"),1)+belly(fkn,fft,1,5,.05,.6,st("pantorrilla"),1);
+ o+=`<ellipse cx="${F(fft[0]+4)}" cy="${F(fft[1]+.5)}" rx="8.5" ry="3.8" fill="#cfd3da" stroke="${O}" stroke-width="1.8"/>`;
+ o+=cap(fsh,fel,5.6,4.4,g("skd"))+cap(fel,fha,4.3,3.2,g("skd"));
+ o+=belly(fsh,fel,-1,5.5,.15,.9,st("biceps"),1)+belly(fsh,fel,1,5.5,.15,.9,st("triceps"),1)+belly(fel,fha,-1,4.3,.05,.65,st("antebrazo"),1);
+ // ---- torso (sin playera para ver los músculos)
+ const T=geo(J.sh,J.hp),nx=T.nx,ny=T.ny,ux=T.ux,uy=T.uy,L=T.L;
+ const P1=[J.sh[0]+nx*11.5-ux*3,J.sh[1]+ny*11.5-uy*3],P2=[J.sh[0]-nx*12.5-ux*3,J.sh[1]-ny*12.5-uy*3],P3=[J.hp[0]-nx*8.5,J.hp[1]-ny*8.5],P4=[J.hp[0]+nx*8.5,J.hp[1]+ny*8.5];
+ const C1=[(P2[0]+P3[0])/2-nx*2.5,(P2[1]+P3[1])/2-ny*2.5],C2=[(P4[0]+P1[0])/2+nx*3,(P4[1]+P1[1])/2+ny*3];
+ o+=`<path d="M${F(P1[0])} ${F(P1[1])} Q${F(J.sh[0]-ux*8)} ${F(J.sh[1]-uy*8)} ${F(P2[0])} ${F(P2[1])} Q${F(C1[0])} ${F(C1[1])} ${F(P3[0])} ${F(P3[1])} L${F(P4[0])} ${F(P4[1])} Q${F(C2[0])} ${F(C2[1])} ${F(P1[0])} ${F(P1[1])} Z" fill="${g("sk")}" stroke="${O}" stroke-width="2.2" stroke-linejoin="round"/>`;
+ // definición anatómica: línea del pectoral y cuadritos del abdomen
+ const at=(t,s)=>[J.sh[0]+ux*L*t-nx*s,J.sh[1]+uy*L*t-ny*s];
+ const pl=[at(.08,12),at(.42,9),at(.46,1)];
+ o+=`<path d="M${F(pl[0][0])} ${F(pl[0][1])} Q${F(pl[1][0])} ${F(pl[1][1])} ${F(pl[2][0])} ${F(pl[2][1])}" stroke="#8a5a3c" stroke-width="1.3" fill="none"/>`;
+ [.58,.7,.82].forEach(t=>{const a=at(t,2),b=at(t,8);o+=`<line x1="${F(a[0])}" y1="${F(a[1])}" x2="${F(b[0])}" y2="${F(b[1])}" stroke="#8a5a3c" stroke-width="1" opacity=".8"/>`});
+ // músculos del torso
+ o+=belly(J.sh,J.hp,1,10,.1,.78,st("dorsal"))+belly(J.sh,J.hp,1,9,-.04,.38,Math.max(st("romboides"),st("trapecio")))+belly(J.sh,J.hp,1,7,.7,1,st("lumbar"));
+ o+=belly(J.sh,J.hp,-1,11,.05,.46,st("pectoral"))+belly(J.sh,J.hp,-1,8.5,.5,.97,Math.max(st("abdomen"),st("oblicuos")));
+ // glúteo y short
+ const gl=[J.hp[0]+nx*6+ux*2,J.hp[1]+ny*6+uy*2];
+ o+=cap(J.hp,[J.hp[0]+(J.kn[0]-J.hp[0])*.55,J.hp[1]+(J.kn[1]-J.hp[1])*.55],9.5,7.6,g("sh"));
+ o+=`<circle cx="${F(J.hp[0])}" cy="${F(J.hp[1])}" r="9.5" fill="${g("sh")}" stroke="${O}" stroke-width="2"/>`;
+ const sg=st("gluteo");if(sg)o+=`<ellipse cx="${F(gl[0])}" cy="${F(gl[1])}" rx="${F(7.5+(sg===2?2*k:0))}" ry="${F(6.5+(sg===2?1.5*k:0))}" fill="${sg===2?g("mr"):g("ms")}" stroke="${O}" stroke-width="1.6" ${sg===2?`filter="${g("gl")}"`:""}/>`;
+ // ---- pierna cercana
+ o+=cap(J.kn,J.ft,6,4,g("sk"))+cap(J.hp,J.kn,8.6,6.6,g("sk"));
+ o+=cap(J.hp,[J.hp[0]+(J.kn[0]-J.hp[0])*.5,J.hp[1]+(J.kn[1]-J.hp[1])*.5],9.4,7.6,g("sh"));
+ o+=belly(J.hp,J.kn,-1,8,.12,.92,st("cuadriceps"))+belly(J.hp,J.kn,-1,5,.25,.8,st("cuadriceps")?0:st("aductores"))+belly(J.hp,J.kn,1,8,.15,.9,st("femoral"))+belly(J.kn,J.ft,1,5.5,.05,.6,st("pantorrilla"));
+ o+=`<ellipse cx="${F(J.ft[0]+4)}" cy="${F(J.ft[1]+.5)}" rx="9" ry="4" fill="#f4f4f4" stroke="${O}" stroke-width="2"/><path d="M${F(J.ft[0]-4)} ${F(J.ft[1]+3)} h16" stroke="#ff6b2c" stroke-width="2"/>`;
+ // ---- cuello y cabeza
  const nk=[J.sh[0]+(J.hd[0]-J.sh[0])*.55,J.sh[1]+(J.hd[1]-J.sh[1])*.55];
- o+=cap(J.sh,nk,4.5,4,g("sk"));
- o+=`<circle cx="${F(J.hd[0])}" cy="${F(J.hd[1])}" r="11.5" fill="${g("hd")}" stroke="#0b0d11" stroke-width="2.4"/>
- <path d="M${F(J.hd[0]-11.5)} ${F(J.hd[1]-1)} A11.5 11.5 0 0 1 ${F(J.hd[0]+10.5)} ${F(J.hd[1]-5)} Q${F(J.hd[0])} ${F(J.hd[1]-6)} ${F(J.hd[0]-11.5)} ${F(J.hd[1]-1)} Z" fill="#2b2118" stroke="#0b0d11" stroke-width="1.5"/>
- <circle cx="${F(J.hd[0]+5.5)}" cy="${F(J.hd[1]+1)}" r="1.6" fill="#0b0d11"/><path d="M${F(J.hd[0]+4)} ${F(J.hd[1]+6)} q2.5 1.5 5 0" stroke="#0b0d11" stroke-width="1.2" fill="none"/>
- <circle cx="${F(J.hd[0]-3)}" cy="${F(J.hd[1]+2)}" r="2.6" fill="#e9a07a" stroke="#0b0d11" stroke-width="1"/>`;
- // brazo cercano: manga corta + antebrazo
- const mid=[J.sh[0]+(J.el[0]-J.sh[0])*.42,J.sh[1]+(J.el[1]-J.sh[1])*.42];
- o+=cap(J.sh,J.el,6.5,5,hl("ua")?g("hl"):g("sk"),hl("ua")?gw:"")+shine(J.sh,J.el,6);
- if(!hl("ua"))o+=cap(J.sh,mid,7.5,6.8,g("sh"));
- o+=cap(J.el,J.ha,5,3.8,hl("fa")?g("hl"):g("sk"),hl("fa")?gw:"")+shine(J.el,J.ha,4.5);
- // bulto muscular que se infla al contraer
- for(const s of ["ua","th"]){if(!hl(s))continue;const a=J[s==="ua"?"sh":"hp"],b=J[s==="ua"?"el":"kn"];
-  const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2,ang=Math.atan2(b[1]-a[1],b[0]-a[0])*180/Math.PI,L2=Math.hypot(b[0]-a[0],b[1]-a[1]);
-  o+=`<ellipse cx="${F(mx)}" cy="${F(my)}" rx="${F(L2/2.8)}" ry="${F((s==="th"?7.5:6)+2.5*k)}" transform="rotate(${F(ang)} ${F(mx)} ${F(my)})" fill="${g("hl")}" stroke="#0b0d11" stroke-width="2" ${gw}/>
-  <ellipse cx="${F(mx-2)}" cy="${F(my-2)}" rx="${F(L2/6)}" ry="2" transform="rotate(${F(ang)} ${F(mx)} ${F(my)})" fill="#fff" opacity=".35"/>`}
- o+=`<circle cx="${F(J.ha[0])}" cy="${F(J.ha[1])}" r="4.6" fill="${g("sk")}" stroke="#0b0d11" stroke-width="2"/>`;
- const h=J.ha,f=J.ft,ms=`stroke="#0b0d11" stroke-width="1.5"`;
- if(pr.includes("db"))o+=`<rect x="${F(h[0]-10)}" y="${F(h[1]-2)}" width="20" height="4" fill="${g("me")}" ${ms}/><rect x="${F(h[0]-15)}" y="${F(h[1]-7.5)}" width="7" height="15" rx="2" fill="#5b6375" ${ms}/><rect x="${F(h[0]+8)}" y="${F(h[1]-7.5)}" width="7" height="15" rx="2" fill="#5b6375" ${ms}/>`;
+ o+=cap(J.sh,nk,4.6,4,g("sk"));
+ o+=`<circle cx="${F(J.hd[0])}" cy="${F(J.hd[1])}" r="11.5" fill="${g("hd")}" stroke="${O}" stroke-width="2.2"/>
+ <path d="M${F(J.hd[0]-11.5)} ${F(J.hd[1]-1)} A11.5 11.5 0 0 1 ${F(J.hd[0]+10.5)} ${F(J.hd[1]-5)} Q${F(J.hd[0])} ${F(J.hd[1]-6)} ${F(J.hd[0]-11.5)} ${F(J.hd[1]-1)} Z" fill="#2b2118" stroke="${O}" stroke-width="1.4"/>
+ <circle cx="${F(J.hd[0]+5.5)}" cy="${F(J.hd[1]+1)}" r="1.6" fill="${O}"/><path d="M${F(J.hd[0]+4)} ${F(J.hd[1]+6)} q2.5 1.5 5 0" stroke="${O}" stroke-width="1.2" fill="none"/>
+ <circle cx="${F(J.hd[0]-3)}" cy="${F(J.hd[1]+2)}" r="2.6" fill="#d9946c" stroke="${O}" stroke-width="1"/>`;
+ // ---- brazo cercano
+ o+=cap(J.sh,J.el,6.6,5,g("sk"))+cap(J.el,J.ha,5,3.8,g("sk"));
+ o+=belly(J.sh,J.el,-1,6.2,.18,.92,st("biceps"))+belly(J.sh,J.el,1,6.2,.15,.92,st("triceps"))+belly(J.el,J.ha,-1,4.8,.05,.65,st("antebrazo"));
+ const sd=st("deltoides");
+ o+=`<circle cx="${F(J.sh[0])}" cy="${F(J.sh[1])}" r="${F(7.4+(sd===2?1.6*k:0))}" fill="${sd===2?g("mr"):sd?g("ms"):g("sk")}" stroke="${O}" stroke-width="2" ${sd===2?`filter="${g("gl")}"`:""}/>`;
+ o+=`<circle cx="${F(J.ha[0])}" cy="${F(J.ha[1])}" r="4.6" fill="${g("sk")}" stroke="${O}" stroke-width="2"/>`;
+ const h=J.ha,f=J.ft,ms=`stroke="${O}" stroke-width="1.5"`;
+ const db=p=>`<rect x="${F(p[0]-10)}" y="${F(p[1]-2)}" width="20" height="4" fill="${g("me")}" ${ms}/><rect x="${F(p[0]-15)}" y="${F(p[1]-7.5)}" width="7" height="15" rx="2" fill="#5b6375" ${ms}/><rect x="${F(p[0]+8)}" y="${F(p[1]-7.5)}" width="7" height="15" rx="2" fill="#5b6375" ${ms}/>`;
+ if(pr.includes("db"))o+=db(h);
  if(pr.includes("handle"))o+=`<rect x="${F(h[0]-3)}" y="${F(h[1]-8)}" width="6" height="16" rx="2" fill="${g("me")}" ${ms}/>`;
  if(pr.includes("bar"))o+=`<rect x="${F(h[0]-24)}" y="${F(h[1]-2.5)}" width="48" height="5" rx="2" fill="${g("me")}" ${ms}/>`;
  if(pr.includes("plate"))o+=`<rect x="${F(f[0]+3)}" y="${F(f[1]-22)}" width="7" height="44" rx="3" fill="${g("me")}" ${ms}/>`;
  if(pr.includes("pad"))o+=`<circle cx="${F(f[0])}" cy="${F(f[1])}" r="6" fill="#5b6375" ${ms}/>`;
- if(label)o+=`<rect x="50" y="4" width="100" height="15" rx="7.5" fill="#0f1115" opacity=".8"/><text x="100" y="14.5" text-anchor="middle" fill="#ff8a50" font-size="8.5" font-weight="800" font-family="Inter">● ${label}</text>`;
  svg.innerHTML=o;
 }
-function startFig(type,label){
- const svg=$("figsvg"),t0=performance.now();cancelAnimationFrame(figRAF);
- const f=now=>{drawFig(svg,type,label,(1-Math.cos((now-t0)/2600*2*Math.PI))/2);figRAF=requestAnimationFrame(f)};figRAF=requestAnimationFrame(f);
+function startFig(id){
+ const e=EX[id],m=MUS[id]||{p:[],s:[]},svg=$("figsvg"),t0=performance.now();cancelAnimationFrame(figRAF);
+ const f=now=>{if(!svg.isConnected)return;drawFig(svg,e.f,(1-Math.cos((now-t0)/2600*2*Math.PI))/2,m.p,m.s);figRAF=requestAnimationFrame(f)};figRAF=requestAnimationFrame(f);
 }
-function thumb(type){return `<svg viewBox="30 18 140 140" width="54" height="54" data-th="${type}" preserveAspectRatio="xMidYMid slice"></svg>`}
-function paintThumbs(){document.querySelectorAll("[data-th]").forEach(s=>drawFig(s,s.dataset.th,"",.6))}
+
+// ================== ANATOMÍA (mapa muscular) ==================
+// Mitad izquierda del cuerpo (x<50); la otra mitad se dibuja en espejo.
+const ANAT_SIL="M50 28 L45 28 Q44 32 40 34 Q30 35 26 40 Q22 46 23 56 Q22 68 21 80 Q18 94 17 108 Q16 116 17 122 Q19 128 23 127 Q26 124 26 116 L27 108 Q30 94 32 84 Q33 76 34 68 Q35 82 37 96 Q34 104 34 112 Q31 130 32 150 Q33 160 35 166 Q31 182 34 200 L34 206 Q31 213 36 216 L45 216 Q46 210 44 205 Q45 190 46 170 Q46 164 47 156 Q48 140 49 120 L50 116 Z";
+const ANAT={
+ front:[
+  ["trapecio","M45 29 Q43 33 36 36 L44 38 Q46 34 46 29 Z"],
+  ["deltoides","M36.5 35 Q27.5 36 25.3 44 Q24.4 52 27 57.5 Q30.5 52 33 46.5 Q35 41 39.5 37 Z"],
+  ["pectoral","M49.5 38 L40.5 37.2 Q34.5 41 33.2 48 Q34.2 56 41 59.3 Q47 60.3 49.5 57.2 Z"],
+  ["biceps","M27.3 58.5 Q24.4 66 25.2 75 Q27 79 30.2 78.2 Q33.2 70 33.2 60.5 Q31.2 55.5 27.3 58.5 Z"],
+  ["antebrazo","M24.2 81 Q19.4 92 18.8 104 Q19.2 110 21.2 111 L25.2 111 Q28.4 98 31.2 85 Q29.2 80 24.2 81 Z"],
+  ["oblicuos","M42 61.5 Q36.5 62 35.3 70 Q35.3 82 38.2 94 Q40.2 96.5 42.3 93 Q41.2 78 42 61.5 Z"],
+  ["abdomen","M49.5 61.5 L43 61.5 Q41.8 74 42.6 88 Q44.4 95.5 49.5 97 Z"],
+  ["cuadriceps","M36.2 112 Q32.2 126 33.2 144 Q35.2 157 40 161 Q45 158.5 46 146 Q47 128 45.2 116 Q41.2 112 36.2 112 Z"],
+  ["aductores","M45.8 117 Q47.8 128 46.8 146 Q48.8 138 49.6 124 L49.6 116.5 Z"],
+  ["tibial","M36.2 167 Q34.2 182 36.2 198 L39.2 203 Q40.2 186 40.2 168 Q38.2 165 36.2 167 Z"],
+  ["pantorrilla","M41.2 168 Q45.2 178 44.2 194 L40.4 203 Q41.4 186 41.2 168 Z"]
+ ],
+ back:[
+  ["dorsal","M37 53 Q34 60 35 70 Q37 82 42 89 Q46 91 49.5 89 L49.5 64 Q47 57 44 51.5 Q41 54 37 53 Z"],
+  ["trapecio","M50 26 L46 27 Q44 32 37 36 Q43 40 46 48 Q48 56 49.6 62 Z"],
+  ["romboides","M38.2 38.5 Q35.2 45 38.2 51.5 Q43 52 45 47 Q43.2 41 38.2 38.5 Z"],
+  ["deltoides","M36.5 35 Q27.5 36 25.3 44 Q24.4 52 27 57.5 Q30.5 52 33 46.5 Q35 41 39.5 37 Z"],
+  ["triceps","M26.2 49 Q23.2 60 24.2 74 Q27.2 79 31 77 Q33.2 66 33.2 55 Q30.2 49 26.2 49 Z"],
+  ["antebrazo","M24.2 81 Q19.4 92 18.8 104 Q19.2 110 21.2 111 L25.2 111 Q28.4 98 31.2 85 Q29.2 80 24.2 81 Z"],
+  ["lumbar","M49.5 90 Q45.2 90.5 43.8 94 Q43.2 98.5 44.2 102 L49.5 104 Z"],
+  ["gluteo","M49.5 105 Q41 102.5 37 108.5 Q34.2 116.5 37.2 124 Q43 129 49.5 126.5 Z"],
+  ["femoral","M36.2 126.5 Q33.2 140 34.7 154 Q37.2 161 41.2 160 Q46.2 150 47.2 132 Q43.2 128.5 36.2 126.5 Z"],
+  ["aductores","M47.4 130 Q48.9 140 47.4 152 Q49.4 142 49.6 128 Z"],
+  ["pantorrilla","M35.2 166 Q31.2 177 34.2 189 Q37.2 195.5 40.2 193.5 Q43.2 192 44.2 186 Q46.2 176 44.2 168 Q40.2 164 35.2 166 Z"]
+ ]
+};
+const MNAME={pectoral:"Pectoral",deltoides:"Deltoides (hombro)",biceps:"Bíceps",triceps:"Tríceps",antebrazo:"Antebrazo",abdomen:"Recto abdominal",oblicuos:"Oblicuos",
+ cuadriceps:"Cuádriceps",aductores:"Aductores",gluteo:"Glúteo mayor",femoral:"Isquiotibiales (femoral)",pantorrilla:"Pantorrilla (gemelos)",dorsal:"Dorsal ancho",
+ trapecio:"Trapecio",romboides:"Romboides / espalda alta",lumbar:"Lumbares (erectores)",tibial:"Tibial anterior"};
+// Músculo principal (p) y de apoyo (s) de cada ejercicio
+const MUS={
+ press:{p:["pectoral"],s:["deltoides","triceps"]},inclinado:{p:["pectoral"],s:["deltoides","triceps"]},aperturas:{p:["pectoral"],s:["deltoides"]},
+ lagartijas:{p:["pectoral","triceps"],s:["deltoides","abdomen"]},maqpecho:{p:["pectoral"],s:["triceps","deltoides"]},pecdeck:{p:["pectoral"],s:["deltoides"]},
+ remo:{p:["dorsal"],s:["biceps","romboides","deltoides"]},remo2:{p:["dorsal","romboides"],s:["biceps","lumbar"]},pullover:{p:["dorsal","pectoral"],s:["triceps"]},
+ posterior:{p:["deltoides","romboides"],s:["trapecio"]},polea:{p:["dorsal"],s:["biceps","romboides"]},remosent:{p:["dorsal","romboides"],s:["biceps"]},
+ invrow:{p:["dorsal","romboides"],s:["biceps","abdomen"]},
+ curl:{p:["biceps"],s:["antebrazo"]},martillo:{p:["biceps","antebrazo"],s:[]},concentrado:{p:["biceps"],s:["antebrazo"]},predicador:{p:["biceps"],s:["antebrazo"]},
+ frances:{p:["triceps"],s:[]},patada:{p:["triceps"],s:["deltoides"]},pushdown:{p:["triceps"],s:["antebrazo"]},fondos:{p:["triceps"],s:["pectoral","deltoides"]},
+ hombro:{p:["deltoides"],s:["triceps","trapecio"]},laterales:{p:["deltoides"],s:["trapecio"]},
+ goblet:{p:["cuadriceps","gluteo"],s:["aductores","abdomen"]},bulgara:{p:["cuadriceps","gluteo"],s:["femoral","aductores"]},stepup:{p:["cuadriceps","gluteo"],s:["femoral","pantorrilla"]},
+ zancada:{p:["cuadriceps","gluteo"],s:["femoral","aductores"]},wallsit:{p:["cuadriceps"],s:["gluteo"]},prensa:{p:["cuadriceps","gluteo"],s:["femoral"]},extension:{p:["cuadriceps"],s:[]},
+ thruster:{p:["cuadriceps","deltoides","gluteo"],s:["triceps","abdomen"]},
+ hipthrust:{p:["gluteo"],s:["femoral","lumbar"]},hipthrustg:{p:["gluteo"],s:["femoral","lumbar"]},puente:{p:["gluteo"],s:["femoral","lumbar"]},
+ kickback:{p:["gluteo"],s:["femoral"]},patadapolea:{p:["gluteo"],s:["femoral"]},swing:{p:["gluteo","femoral"],s:["lumbar","deltoides"]},
+ rdl:{p:["femoral","gluteo"],s:["lumbar","antebrazo"]},slidecurl:{p:["femoral"],s:["gluteo","pantorrilla"]},femoral:{p:["femoral"],s:["pantorrilla"]},
+ pantorrilla:{p:["pantorrilla"],s:[]},pantsent:{p:["pantorrilla"],s:[]},
+ plancha:{p:["abdomen"],s:["oblicuos","deltoides"]},deadbug:{p:["abdomen"],s:["oblicuos"]},crunch:{p:["abdomen"],s:["oblicuos"]},rusos:{p:["oblicuos"],s:["abdomen"]},
+ elevpiernas:{p:["abdomen"],s:["oblicuos"]},climber:{p:["abdomen"],s:["deltoides","cuadriceps"]},farmer:{p:["antebrazo","trapecio"],s:["abdomen"]},
+ eliptica:{p:["cuadriceps","gluteo"],s:["pantorrilla","femoral"]}
+};
+const BACKVIEW=["dorsal","romboides","triceps","lumbar","gluteo","femoral","pantorrilla"];
+function anatomy(view,prim,sec,w,anim,vb,h){
+ const id="an"+Math.random().toString(36).slice(2,7),fill=m=>prim.includes(m)?`url(#p${id})`:sec.includes(m)?`url(#s${id})`:`url(#b${id})`;
+ const half=ANAT[view].map(([m,d])=>`<path d="${d}" fill="${fill(m)}" stroke="#0e1117" stroke-width=".7" stroke-linejoin="round">${anim&&prim.includes(m)?'<animate attributeName="opacity" values="1;.55;1" dur="1.5s" repeatCount="indefinite"/>':""}</path>`).join("")
+  +(view==="front"?`<path d="M43 69 L49.5 69 M42.6 77 L49.5 77 M42.8 85 L49.5 85" stroke="#0e1117" stroke-width=".7"/><ellipse cx="40.5" cy="164" rx="3.2" ry="2.6" fill="#3a4152" stroke="#0e1117" stroke-width=".6"/>`
+   :`<path d="M41 196 Q40 203 40 206" stroke="#0e1117" stroke-width=".6" fill="none"/>`);
+ const body=`<path d="${ANAT_SIL}" fill="#262c38"/>${half}`;
+ return `<svg viewBox="${vb||"8 0 84 222"}" width="${w}" ${h?`height="${h}"`:""} preserveAspectRatio="xMidYMid meet" style="display:block"><defs>
+ <linearGradient id="b${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5a6378"/><stop offset="1" stop-color="#363d4c"/></linearGradient>
+ <linearGradient id="p${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff6b5e"/><stop offset=".6" stop-color="#e02424"/><stop offset="1" stop-color="#9b1515"/></linearGradient>
+ <linearGradient id="s${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffc56b"/><stop offset="1" stop-color="#e07b10"/></linearGradient></defs>
+ <ellipse cx="50" cy="15.5" rx="8.8" ry="10.8" fill="#4a5265" stroke="#0e1117" stroke-width=".7"/><path d="M45.5 25 L54.5 25 L56 31 L44 31 Z" fill="#4a5265"/>
+ ${body}<g transform="translate(100 0) scale(-1 1)">${body}</g></svg>`;
+}
+function anatomyCard(id){
+ const m=MUS[id]||{p:[],s:[]};
+ return `<div class="anat"><div><small>FRENTE</small>${anatomy("front",m.p,m.s,"100%",1)}</div><div><small>ESPALDA</small>${anatomy("back",m.p,m.s,"100%",1)}</div></div>
+ <div class="mleg"><span><i style="background:#e02424"></i><b>Principal:</b> ${m.p.map(x=>MNAME[x]).join(", ")||"—"}</span>${m.s.length?`<span><i style="background:#f59e0b"></i><b>Apoyo:</b> ${m.s.map(x=>MNAME[x]).join(", ")}</span>`:""}</div>`;
+}
+function thumb(id){const m=MUS[id]||{p:[],s:[]},v=m.p.length&&m.p.every(x=>BACKVIEW.includes(x))?"back":"front";
+ const low=["cuadriceps","femoral","gluteo","pantorrilla","aductores"],core=["abdomen","oblicuos"];
+ const vb=m.p.some(x=>["gluteo"].includes(x))&&!m.p.some(x=>["cuadriceps"].includes(x))?"14 88 72 72":m.p.every(x=>low.includes(x))?"14 104 72 96":m.p.every(x=>core.includes(x))?"14 44 72 72":"14 24 72 80";
+ return anatomy(v,m.p,m.s,54,0,vb,54)}
+function paintThumbs(){}
 
 // ================== ESTADO ==================
 let ME=null;            // {user, pinHash}
@@ -782,7 +903,7 @@ function render(){
  const u=ME.user,h=new Date().getHours();
  $("greet").textContent=(h<12?"Buenos días":h<19?"Buenas tardes":"Buenas noches")+", "+String(u.nombre).split(" ")[0]+" 👋";
  $("av").textContent=String(u.nombre)[0].toUpperCase();$("av").style.background=u.color||COLORS[0];$("av").onclick=()=>goView("perfil");
- renderCoach();renderHero();renderWeek();renderWorkout();
+ renderCoach();renderHero();renderWeek();renderWorkout();renderHabits();
 }
 function renderCoach(){
  const u=ME.user,s=phaseStatus(),t=todayISO(),tp=dayPlan(t),ts=SES[t],st=streak(),msgs=[],pend=pendingSlots();
@@ -794,7 +915,9 @@ function renderCoach(){
  else if(tp.rest)msgs.push(["😴","Hoy es tu día de descanso. El músculo crece cuando descansas: camina 30 min y estira."]);
  else msgs.push(["💪",st>=2?`Racha de <b>${st} días</b>. ¡No la rompas hoy!`:`Hoy toca <b>${tp.t}</b>. Calienta 5 minutos y a darle.`]);
  if(s.meta&&s.days<s.meta)msgs.push(["🎯",`Te faltan <b>${s.meta-s.days} rutinas cumplidas</b> para desbloquear la fase ${PHASES[(+u.fase||0)===3?1:(+u.fase||0)+1].n}.`]);
- $("coach").innerHTML=`<div class="ic">🥋</div><div>${msgs.slice(0,2).map(m=>`<p>${m[0]} ${m[1]}</p>`).join('<div style="height:6px"></div>')}</div>`;
+ const tip=tipOfDay();
+ $("coach").innerHTML=`<div class="ic">🥋</div><div style="flex:1">${msgs.slice(0,2).map(m=>`<p>${m[0]} ${m[1]}</p>`).join('<div style="height:6px"></div>')}
+ <div class="dato"><b>📚 Dato del día · ${tip[0]}</b><br>${tip[1]}</div></div>`;
 }
 function dayPlanSlot(k){return buildDay(ME.user,k,ME.user.lugar||"casa")}
 function renderHero(){
@@ -825,7 +948,7 @@ function renderWorkout(){
  const rows=p.x.map(r=>{const e=EX[r[0]],st=(s.detalle.sets[r[0]]||[]);tot+=r[1];ok+=st.slice(0,r[1]).filter(Boolean).length;
   const timed=/s$|min|máx/.test(r[2]),lk=timed?null:lastKg(r[0],f),kg=s.detalle.kg[r[0]]||"";
   let sug="";if(lk){sug=lk.done>=lk.total?`⬆️ La vez pasada: ${lk.kg} kg completo → prueba ${(+lk.kg+(+lk.kg<10?1:2))} kg`:`↔️ La vez pasada: ${lk.kg} kg (${lk.done}/${lk.total} series) → repite el peso`}
-  return `<div class="ex"><div class="exh"><div class="thumb" data-e="${r[0]}">${thumb(e.f)}</div><div style="flex:1;min-width:0"><div class="exn" data-e="${r[0]}">${e.n}</div><div class="exm">${e.m}</div>
+  return `<div class="ex"><div class="exh"><div class="thumb" data-e="${r[0]}">${thumb(r[0])}</div><div style="flex:1;min-width:0"><div class="exn" data-e="${r[0]}">${e.n}</div><div class="exm">${e.m}</div>
   <div class="rx"><b>${r[1]}</b> ${r[1]===1?"vez":"series"} × <b>${r[2]}</b>${timed?"":" reps"}</div>${e.acc&&lug==="casa"?`<div class="exm" style="color:var(--blue)">${e.acc}</div>`:""}</div></div>
   <div class="sets">${Array.from({length:r[1]},(_,k)=>`<button class="set ${st[k]?"done":""}" data-x="${r[0]}" data-k="${k}" ${future?"disabled":""}>${st[k]?"✓":k+1}</button>`).join("")}
   ${timed||e.f==="bike"||e.f==="plank"||e.f==="climber"||e.f==="wallsit"?"":`<input class="kg" type="number" inputmode="decimal" placeholder="kg" value="${esc(kg)}" data-kg="${r[0]}" ${future?"disabled":""}>`}</div>
@@ -836,6 +959,7 @@ function renderWorkout(){
  <div class="row" style="margin-bottom:12px"><button class="chip ${lug==="casa"?"on":""}" data-lug="casa">🏠 En casa</button><button class="chip ${lug==="gym"?"on":""}" data-lug="gym">🏢 En el gym</button></div>
  <div class="dayh"><h2>${p.t}</h2><span class="tag">${lug==="gym"?"GYM":"CASA"}</span></div>
  <details class="info" open><summary>🎯 Qué lograrás y por qué estos ejercicios</summary><p><b>Lograrás:</b> ${p.logro}</p>${p.why.map(w=>`<p>• ${w}</p>`).join("")}</details>
+ <p class="note" style="margin:8px 0">🔥 <b style="color:var(--txt)">Calienta 5 min</b> y haz 1 serie ligera del primer ejercicio. 🎯 <b style="color:var(--txt)">Esfuerzo:</b> termina cada serie sintiendo que podías hacer 1–3 repeticiones más (no hace falta llegar al fallo, ACSM 2026).</p>
  ${lug==="casa"?'<p class="note" style="margin:8px 0">¿Sin mancuernas? Usa garrafones de agua, una mochila con libros o botellas llenas.</p>':""}
  ${fin?'<p class="note">➕ Al terminar: 12–15 min de caminata rápida o bici para quemar grasa.</p>':""}
  ${doneElse?'<p class="note" style="color:var(--ok)">✅ Ya completaste esta rutina esta semana. Hacerla otra vez suma extra.</p>':""}
@@ -852,11 +976,11 @@ function renderWorkout(){
 function openEx(id){
  const e=EX[id],q=encodeURIComponent(e.n+" técnica correcta");
  openSheet(`<h3>${e.n}</h3><div class="exm">${e.m}</div>${e.acc?`<div class="exm" style="color:var(--blue);margin-top:4px">Necesitas: ${e.acc}</div>`:""}
- <div class="fig"><svg id="figsvg" viewBox="0 0 200 160" width="100%" style="max-width:360px;border-radius:10px"></svg></div>
+ ${anatomyCard(id)}<div class="fig"><svg id="figsvg" viewBox="0 0 200 160" width="100%" style="max-width:360px;border-radius:10px"></svg></div><p class="note" style="text-align:center;margin-top:-6px">Así se mueve: el músculo en rojo se infla cuando trabaja</p>
  <ol>${e.s.map(s=>`<li>${s}</li>`).join("")}</ol><div class="tip">💡 ${e.t}</div>
  ${(+ME.user.edad>=45||caution(ME.user))?'<div class="tip w">⚠️ Prioriza técnica y rango controlado sobre el peso; respira normal, no aguantes el aire.</div>':""}
  <div class="row" style="margin-top:14px"><a class="btn" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">▶ Ver video</a><button class="btn g" onclick="closeSheet()">Cerrar</button></div>`);
- startFig(e.f,"Trabaja: "+e.m.split("·")[0].trim());
+ startFig(id);
 }
 
 // ================== PROGRESO ==================
@@ -937,7 +1061,7 @@ function nutrition(){
  const bmr=10*w+6.25*h-5*a+(u.sexo==="m"?-161:5),tdee=bmr*(1.3+trainDays(u).length*.05);
  let adj=o.includes("grasa")&&(o.includes("musculo")||o.includes("fuerza"))?-200:o.includes("grasa")?-450:(o.includes("musculo")||o.includes("fuerza"))?+300:o.includes("tono")?-200:0;
  if(c.includes("embarazo"))adj=0;
- const kcal=Math.round((tdee+adj)/50)*50,prot=Math.round(w*(o.includes("grasa")?2:(o.includes("musculo")||o.includes("fuerza")||o.includes("tono"))?1.8:1.4)),agua=(w*.035+.5).toFixed(1);
+ const kcal=Math.round((tdee+adj)/50)*50,prot=Math.round(w*(o.includes("grasa")?2:(o.includes("musculo")||o.includes("fuerza"))?1.8:o.includes("tono")?1.6:1.4)),agua=(u.sexo==="m"?2.0:2.5).toFixed(1);
  return {kcal,prot,agua,fat:Math.round(kcal*.27/9),carb:Math.max(0,Math.round((kcal-prot*4-kcal*.27)/4))};
 }
 function renderFood(){
@@ -956,7 +1080,18 @@ function renderFood(){
  if(!tips.length)tips.push("Come variado, muchas verduras y agua natural. La constancia vale más que la perfección.");
  $("v-comida").innerHTML=`<div class="card"><div class="dayh"><h2>🥗 Tu plan de hoy</h2><span class="tag">${o.map(x=>OBJ[x]?OBJ[x][0]:"").join(" ")}</span></div>
  <div class="macro"><div><b style="color:var(--acc)">${n.kcal}</b><span>kcal / día</span></div><div><b style="color:var(--blue)">${n.prot} g</b><span>proteína</span></div><div><b style="color:#14b8a6">${n.agua} L</b><span>agua</span></div></div>
- <p class="note" style="margin-top:10px">Aprox. ${n.carb} g de carbohidratos y ${n.fat} g de grasa. Proteína ≈ ${Math.round(n.prot/4)} g por comida.${pr.length?" Adaptado a: "+pr.map(p=>DIET.find(d=>d[0]===p)[1].toLowerCase()).join(", ")+".":""}</p></div>
+ <p class="note" style="margin-top:10px">Aprox. ${n.carb} g de carbohidratos y ${n.fat} g de grasa. Proteína ≈ ${Math.round(n.prot/4)} g por comida (ISSN recomienda 20–40 g cada 3–4 h). Agua total según EFSA, incluye la de los alimentos; suma ~0.5 L los días que entrenas.${pr.length?" Adaptado a: "+pr.map(p=>DIET.find(d=>d[0]===p)[1].toLowerCase()).join(", ")+".":""}</p></div>
+ <div class="card"><h2>🍽️ El plato del Dojo</h2><p class="note" style="margin:4px 0 10px">Basado en el Plato para Comer Saludable de Harvard.</p>
+ <div style="display:flex;gap:14px;align-items:center"><svg viewBox="0 0 100 100" width="120" style="flex-shrink:0"><circle cx="50" cy="50" r="48" fill="#e9ecf2"/>
+ <path d="M50 50 L50 6 A44 44 0 0 1 50 94 Z" fill="#22c55e"/><path d="M50 50 L50 94 A44 44 0 0 1 6 50 Z" fill="#d4a24c"/><path d="M50 50 L6 50 A44 44 0 0 1 50 6 Z" fill="#ef6b4a"/>
+ <circle cx="50" cy="50" r="44" fill="none" stroke="#0f1115" stroke-width="1.5"/><text x="72" y="54" text-anchor="middle" font-size="22">🥦</text><text x="30" y="77" text-anchor="middle" font-size="16">🌾</text><text x="30" y="36" text-anchor="middle" font-size="16">🍗</text></svg>
+ <div style="font-size:13px;line-height:1.6"><b style="color:#22c55e">½ Verduras y frutas</b> (más verdura; la papa no cuenta)<br><b style="color:#d4a24c">¼ Granos integrales</b> (tortilla de maíz, arroz integral, avena)<br><b style="color:#ef6b4a">¼ Proteína</b> (pollo, pescado, huevo, frijol)<br>💧 Agua natural para tomar</div></div></div>
+ <div class="card"><h2>📏 Tus límites diarios <span class="note" style="font-size:12px">(OMS)</span></h2>
+ <div class="lg"><span>🧂 Sal</span><span>menos de 5 g (1 cucharadita)</span></div>
+ <div class="lg"><span>🍬 Azúcares libres</span><span>menos de 50 g · ideal 25 g</span></div>
+ <div class="lg"><span>🥗 Frutas y verduras</span><span>mínimo 400 g (5 porciones)</span></div>
+ <div class="lg"><span>🌾 Fibra</span><span>mínimo 25 g</span></div>
+ <div class="lg"><span>🍳 Grasas</span><span>menos del 30% de calorías, evita las trans</span></div></div>
  <div class="card"><h2>🍽️ Menú sugerido</h2>
  ${[["🌅","Desayuno",pick("des")],["🍎","Colación",pick("snk")],["🍛","Comida",pick("com")],["🥜","Colación",pick("snk",3)],["🌙","Cena",pick("cen")]].map(m=>`<div class="meal"><div class="e">${m[0]}</div><div><b>${m[1]}</b><p>${m[2]}</p></div></div>`).join("")}
  <p class="note" style="margin-top:8px">El menú cambia cada día. Porciones: proteína del tamaño de tu palma, carbohidratos de tu puño, verduras sin límite.</p></div>
@@ -988,6 +1123,8 @@ function renderPerfil(){
   <p class="note" style="margin-top:8px">Por correo: felicitación al cumplir tu rutina y recordatorio a las 7 pm si te falta.</p></div>
  <div class="card"><h2>🔐 Seguridad</h2><label style="margin-top:8px;display:block">Nuevo PIN (4 dígitos)</label><input id="pPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••">
   <button class="btn g w" id="pPinB">Cambiar PIN</button></div>
+ <div class="card sci"><h2>📚 La ciencia detrás del Dojo</h2><p class="note" style="margin:4px 0 6px">Tu plan se basa en estas guías internacionales:</p>
+ ${SCI.map(s=>`<div class="lg"><span>${s[0]}</span><a href="${s[2]}" target="_blank" rel="noopener" style="flex:1;text-align:right">${s[1]} ↗</a></div>`).join("")}</div>
  <div class="card note"><b style="color:var(--txt)">Reglas del Dojo</b><br>• Calienta 5 min antes de empezar.<br>• Elige un peso con el que las últimas 2 reps cuesten trabajo, con buena técnica.<br>• Toca cada recuadro al terminar una serie: arranca tu descanso.<br>• Anota los kg: la app te dirá cuándo subir.<br>• Si hay dolor en articulaciones (no muscular), detente.<br>• Duerme 7–8 h y toma agua.</div>
  <button class="btn g w" id="pOut">🚪 Cerrar sesión / cambiar de perfil</button>`;
  ["pObj","pDias","pFoc","pSal","pAli"].forEach(id=>$(id).querySelectorAll(".chip").forEach(b=>b.onclick=()=>b.classList.toggle("on")));
@@ -1006,18 +1143,79 @@ function renderPerfil(){
 }
 
 // ================== RANKING ==================
+const MEMES={
+ top:["👑 Modo final boss activado. Los demás te ven como el jefe del último nivel.","🔥 Ni el Wi-Fi de tu casa es tan constante como tú.","😎 Las pesas ya te saludan por tu nombre.",
+  "🦾 Tú no tienes días flojos, tienes días de descanso programados.","🏆 Al paso que vas, la báscula te va a pedir autógrafo.","🚀 Nivel de disciplina: abuelita que nunca falta a misa.",
+  "🥇 Si la constancia fuera Netflix, tú serías la serie más vista.","💎 Eres el 'ya llegué' de los grupos: siempre puntual."],
+ mid:["📈 Vas en ascenso, como el precio del aguacate.","🧗 Mitad de la tabla, pero con cara de protagonista.","🎬 No eres el primero… todavía. Plot twist en camino.",
+  "💪 Ni muy muy, ni tan tan: perfectamente peligroso.","🐢 La tortuga también ganó la carrera, eh. Paso firme.","⚡ Un par de rutinas más y le haces 'sorpasso' al de arriba.",
+  "🎮 Estás a nada de subir de nivel. ¡No sueltes el control!","🌮 Vas como taco de suadero: sólido y con potencial."],
+ bottom:["🦥 Modo ahorro de energía detectado. ¿Lo apagamos hoy con una rutina?","🛋️ El sillón te extraña, pero las pesas te extrañan más.","📺 'Ahorita voy'… dijo el del último lugar 😅 ¡Hoy es día de comeback!",
+  "⏰ Tu racha está en modo avión. Actívala con una rutina.","🍿 Los demás van por la secuela; tú sigues en los créditos de inicio. ¡Dale play!","🐌 Lento pero seguro… ¡seguro que hoy sí entrenas!",
+  "🔋 Batería al 5%. Una rutina y te cargas al 100.","🧟 Hasta los zombies caminan más. ¡Tú puedes con 20 minutos hoy!"]
+};
+function pickMeme(cat,seed,used){const a=MEMES[cat];let h=Math.floor(Date.now()/864e5);for(const c of String(seed))h=(h*31+c.charCodeAt(0))>>>0;let i=h%a.length;if(used){for(let n=0;n<a.length&&used.has(a[i]);n++)i=(i+1)%a.length;used.add(a[i])}return a[i]}
 async function renderRank(){
  const el=$("v-rank");el.innerHTML=`<div class="card"><p class="note">Cargando ranking…</p></div>`;
  try{
-  const r=(await api("ranking",authed())).ranking,medal=["🥇","🥈","🥉"],last=r.length>=3?r[r.length-1]:null,lazy=last&&last.pct<60;
-  el.innerHTML=`<div class="card"><div class="dayh"><h2>🏆 Ranking del Dojo</h2><span class="tag">30 días</span></div>
+  const r=(await api("ranking",authed())).ranking,medal=["🥇","🥈","🥉"],n=r.length;
+  const cat=i=>i===0?"top":(n>=3&&i===n-1)?"bottom":"mid",used=new Set();
+  const me=r.findIndex(x=>x.yo);let mine="";
+  if(me>=0){const x=r[me];let need="";
+   if(me>0){const up=r[me-1];for(let k=1;k<=30;k++){if(Math.round((x.cum30+k)/((x.plan||0)+k)*100)>up.pct){need=`Con <b>${k} rutina${k>1?"s":""}</b> cumplida${k>1?"s":""} a tiempo pasas a <b>${esc(up.nombre)}</b>.`;break}}}
+   mine=`<div class="card hero" style="display:block"><div class="note">Tu lugar en el Dojo</div><h2 style="font-size:28px">${medal[me]||"#"+(me+1)} <span class="note" style="font-size:14px">de ${n}</span></h2>
+   <p style="font-size:14.5px;margin-top:6px;line-height:1.45">${pickMeme(cat(me),x.nombre)}</p>${need?`<p class="note" style="margin-top:8px">${need}</p>`:me===0?`<p class="note" style="margin-top:8px">Defiende la corona: cada rutina cuenta. 👑</p>`:""}</div>`}
+  el.innerHTML=`${mine}<div class="card"><div class="dayh"><h2>🏆 Ranking del Dojo</h2><span class="tag">30 días</span></div>
   <p class="note">Gana la constancia: % de rutinas cumplidas de las que cada quien programó. Nunca se muestra peso ni salud.</p></div>
   <div class="card">${r.map((x,i)=>`<div class="rk ${x.yo?"me":""}"><div class="pos">${medal[i]||i+1}</div><div class="av" style="width:38px;height:38px;font-size:15px;background:${x.color||COLORS[0]}">${esc(String(x.nombre)[0])}</div>
-   <div style="flex:1;min-width:0"><b>${esc(x.nombre)}${x.yo?" (tú)":""}${lazy&&x===last?" 🦥":""}</b><div class="bar" style="margin:5px 0 3px"><i style="width:${x.pct}%;background:${x.pct>=80?"var(--ok)":x.pct>=50?"var(--warn)":"var(--acc)"}"></i></div>
-   <div class="note">${x.cum30} rutinas · semana ${x.sem}/${x.meta} · racha ${x.racha}🔥</div></div><div class="pct">${x.pct}%</div></div>`).join("")||'<p class="note">Aún no hay nadie en el ranking.</p>'}</div>
-  ${lazy?`<div class="card note">🦥 <b style="color:var(--txt)">${esc(last.nombre)}</b> va hasta abajo… ¡ánimo! Una rutina hoy y sube varios lugares.</div>`:""}
-  ${r.find(x=>x.yo&&x.oculto)?'<p class="note" style="text-align:center">Tienes el ranking desactivado: los demás no te ven. Actívalo en Perfil.</p>':""}`;
+   <div style="flex:1;min-width:0"><b>${esc(x.nombre)}${x.yo?" (tú)":""}</b><div class="bar" style="margin:5px 0 3px"><i style="width:${x.pct}%;background:${x.pct>=80?"var(--ok)":x.pct>=50?"var(--warn)":"var(--acc)"}"></i></div>
+   <div class="note">${x.cum30} rutinas · semana ${x.sem}/${x.meta} · racha ${x.racha}🔥</div><div class="meme">${pickMeme(cat(i),x.nombre+i,used)}</div></div><div class="pct">${x.pct}%</div></div>`).join("")||'<p class="note">Aún no hay nadie en el ranking.</p>'}</div>
+  ${r.find(x=>x.yo&&x.oculto)?'<p class="note" style="text-align:center">Tienes el ranking desactivado: los demás no te ven. Actívalo en Perfil.</p>':""}
+  <p class="note" style="text-align:center;margin:6px 12px">Los mensajes son de cotorreo y cambian cada día. Aquí se mide la constancia, no el cuerpo de nadie. 🤝</p>`;
  }catch(e){el.innerHTML=`<div class="card"><p class="note">No se pudo cargar el ranking: ${esc(e.message)}</p></div>`}
+}
+
+// ================== CIENCIA DEL DOJO ==================
+const SCI=[
+ ["OMS 2020","Guía de actividad física y comportamiento sedentario","https://www.ncbi.nlm.nih.gov/books/NBK566048/"],
+ ["ACSM 2026","Position Stand: prescripción del entrenamiento de fuerza","https://acsm.org/wp-content/uploads/2026/03/Pronouncement-ppt-deck_resistance-training-ps.pdf"],
+ ["ISSN 2017","Position Stand: proteína y ejercicio","https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5477153/"],
+ ["Harvard","Plato para comer saludable (Healthy Eating Plate)","https://nutritionsource.hsph.harvard.edu/healthy-eating-plate/"],
+ ["OMS 2026","Alimentación saludable: sal, azúcar, fibra, frutas y verduras","https://www.who.int/news-room/fact-sheets/detail/healthy-diet"],
+ ["EFSA","Valores de referencia de agua (2.0 L mujeres · 2.5 L hombres)","https://www.efsa.europa.eu/en/press/news/nda100326"],
+ ["AASM/SRS","Consenso: adultos, 7 o más horas de sueño","https://aasm.org/seven-or-more-hours-of-sleep-per-night-a-health-necessity-for-adults/"],
+ ["Lancet 2025","Pasos diarios y salud: meta realista de 7,000 pasos","https://pubmed.ncbi.nlm.nih.gov/40713949/"],
+ ["PAR-Q+","Cuestionario de aptitud para la actividad física","https://saludable.unizar.es/sites/saludable/files/users/deportes/pdf/parq.pdf"]
+];
+const TIPS=[
+ ["OMS","Adultos: 150–300 min a la semana de actividad moderada y fuerza en todos los grupos musculares 2 o más días."],
+ ["OMS","Todo movimiento cuenta: subir escaleras o limpiar la casa también suma minutos."],
+ ["Lancet 2025","7,000 pasos al día ya se asocian con mucho menor riesgo de enfermedad. ¡Camina después de comer!"],
+ ["ACSM 2026","Para crecer, acumula alrededor de 10 series por músculo a la semana."],
+ ["ACSM 2026","No necesitas llegar al fallo: termina cada serie con 1–3 repeticiones 'en reserva'."],
+ ["ACSM 2026","Usa todo el rango de movimiento: da mejores resultados de fuerza y músculo."],
+ ["ACSM 2026","Haz primero los ejercicios grandes (sentadilla, press, remo) y al final los pequeños."],
+ ["ACSM","Progresa poco a poco: más peso, o más repeticiones, o más series. Una cosa a la vez."],
+ ["ISSN","Proteína diaria: 1.4–2.0 g por kg de peso si entrenas fuerza."],
+ ["ISSN","Reparte tu proteína: 20–40 g por comida, cada 3–4 horas."],
+ ["ISSN","Proteína antes de dormir (30–40 g, por ejemplo yogurt griego o leche) ayuda a la recuperación nocturna."],
+ ["Harvard","Arma tu plato: ½ verduras y frutas, ¼ granos integrales, ¼ proteína saludable."],
+ ["Harvard","Las papas y las papas fritas no cuentan como verdura en el plato saludable."],
+ ["OMS","Menos de 5 g de sal al día: más o menos una cucharadita. Ojo con embutidos y sopas instantáneas."],
+ ["OMS","Azúcares libres: menos de 50 g al día (ideal menos de 25 g). Los jugos y refrescos cuentan."],
+ ["OMS","Come al menos 400 g de frutas y verduras al día: unas 5 porciones."],
+ ["OMS","Meta de fibra: 25 g al día (frijoles, avena, verduras, fruta con cáscara)."],
+ ["EFSA","Agua total al día: 2.0 L mujeres y 2.5 L hombres; 20–30% viene de la comida."],
+ ["AASM","Duerme 7 horas o más: dormir poco se asocia con más peso, presión alta y peor rendimiento."]
+];
+function tipOfDay(){const d=Math.floor(Date.now()/864e5);return TIPS[(d+String(ME.user.id).length)%TIPS.length]}
+// Hábitos del día (se guardan en este celular)
+const HAB=[["agua","💧","Agua"],["pasos","🚶","7,000 pasos"],["prot","🍗","Proteína en cada comida"],["verdura","🥦","5 porciones de fruta/verdura"],["sueno","😴","Dormí 7 h o más"]];
+function renderHabits(){
+ const k="dojo_hab_"+ME.user.id+"_"+todayISO(),h=store.get(k,{}),n=HAB.filter(x=>h[x[0]]).length,el=$("habits");if(!el)return;
+ el.innerHTML=`<div class="dayh"><h2>✅ Hábitos de hoy</h2><span class="tag">${n}/${HAB.length}</span></div><p class="note" style="margin-bottom:8px">Basados en OMS, EFSA y AASM. El entrenamiento es la mitad; esto es la otra mitad.</p>
+ <div class="row">${HAB.map(([id,e,l])=>`<button class="chip ${h[id]?"on":""}" data-h="${id}">${e} ${l}</button>`).join("")}</div>${n===HAB.length?'<p class="note" style="margin-top:8px;color:var(--ok)">🌟 ¡Día perfecto! Así se construye un cuerpo y una vida sana.</p>':""}`;
+ el.querySelectorAll("[data-h]").forEach(b=>b.onclick=()=>{h[b.dataset.h]=!h[b.dataset.h];store.set(k,h);vib(8);renderHabits();if(HAB.every(x=>h[x[0]]))confetti()});
 }
 
 // ================== ADMIN ==================
