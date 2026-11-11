@@ -1,6 +1,7 @@
 {
-  "name": "Rutina Mancuernas",
-  "short_name": "Rutina",
+  "name": "DojoApp",
+  "short_name": "DojoApp",
+  "description": "Tu entrenador de bolsillo",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
