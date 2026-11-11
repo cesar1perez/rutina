@@ -115,29 +115,25 @@ table.adm{width:100%;border-collapse:collapse;font-size:12px}
 table.adm th{color:var(--mut);text-align:left;font-weight:600;padding:6px 4px;border-bottom:1px solid var(--line)}
 table.adm td{padding:8px 4px;border-bottom:1px solid var(--line)}
 details.info{background:var(--card2);border-radius:12px;padding:10px 12px;margin:8px 0}details.info summary{font-weight:700;font-size:13.5px;cursor:pointer}details.info p{font-size:13px;line-height:1.5;margin-top:6px;color:#cfd5e1}
+.rk{display:flex;gap:10px;align-items:center;padding:11px 4px;border-top:1px solid var(--line)}.rk:first-child{border-top:0}.rk.me{background:#2a160866;border-radius:12px}.pos{width:28px;text-align:center;font-weight:900;font-size:18px}.pct{font-weight:900;font-size:17px}
+.nav button{padding:6px 6px!important}
 .rest{text-align:center;padding:24px 10px;color:var(--mut)}
 .link{background:none;border:0;color:var(--mut);font:600 13px Inter;cursor:pointer;text-decoration:underline;margin-top:22px}
 </style>
 </head>
 <body>
 
-<!-- ===== Selección de perfil ===== -->
+<!-- ===== Entrar ===== -->
 <div class="screen" id="sPick"><div class="center">
- <div class="logo">Dojo<span>App</span></div>
- <p class="sub">Tu entrenador de bolsillo 🥋</p>
- <h2 style="margin-top:26px">¿Quién va a entrenar?</h2>
- <div class="pgrid" id="pgrid"><div class="note" style="grid-column:span 2">Cargando perfiles…</div></div>
+ <div class="logo">Dojo<span>App</span></div><p class="sub">Tu entrenador de bolsillo 🥋</p>
+ <div id="known"></div>
+ <div class="card" style="text-align:left;margin-top:18px"><h2 style="margin-bottom:10px">Entrar</h2>
+  <label>Celular, correo o nombre</label><input id="lId" autocomplete="username" placeholder="7751234567">
+  <label>PIN</label><input id="lPin" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password" placeholder="••••">
+  <label style="display:flex;gap:8px;align-items:center;font-weight:400"><input type="checkbox" id="remember" checked style="width:auto;margin:0"> Recordarme en este celular</label>
+  <button class="btn w" id="lGo" style="margin-top:12px">Entrar</button></div>
+ <button class="btn g w" id="pnew">✨ Soy nuevo · Crear cuenta</button>
  <button class="link" id="admLink">Panel de administrador</button>
-</div></div>
-
-<!-- ===== PIN ===== -->
-<div class="screen off" id="sPin"><div class="center">
- <div class="av" id="pinAv" style="width:70px;height:70px;font-size:28px;margin:10px auto"></div>
- <h2 id="pinName"></h2><p class="sub">Escribe tu PIN de 4 dígitos</p>
- <div class="dots" id="pinDots"><i></i><i></i><i></i><i></i></div>
- <div class="pad" id="pinPad"></div>
- <label style="display:flex;gap:8px;justify-content:center;align-items:center;margin-top:18px"><input type="checkbox" id="remember" checked style="width:auto;margin:0"> Recordarme en este celular</label>
- <button class="link" id="pinBack">← Elegir otro perfil</button>
 </div></div>
 
 <!-- ===== Registro ===== -->
@@ -153,6 +149,7 @@ details.info{background:var(--card2);border-radius:12px;padding:10px 12px;margin
   <div class="card" id="workout"></div>
  </section>
  <section class="view" id="v-prog"></section>
+ <section class="view" id="v-rank"></section>
  <section class="view" id="v-comida"></section>
  <section class="view" id="v-perfil"></section>
  <div class="sync" id="sync"></div>
@@ -162,7 +159,7 @@ details.info{background:var(--card2);border-radius:12px;padding:10px 12px;margin
  <div style="flex:1"></div><button id="rm">−15</button><button id="rp">+15</button><button id="rs" style="background:var(--ok);color:#06210f">Listo</button></div>
 <nav class="nav" id="nav" style="display:none">
  <button class="on" data-v="hoy"><span>🏋️</span>Hoy</button><button data-v="prog"><span>📈</span>Progreso</button>
- <button data-v="comida"><span>🥗</span>Comida</button><button data-v="perfil"><span>👤</span>Perfil</button></nav>
+ <button data-v="rank"><span>🏆</span>Ranking</button><button data-v="comida"><span>🥗</span>Comida</button><button data-v="perfil"><span>👤</span>Perfil</button></nav>
 <div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
 
 <script>
@@ -440,57 +437,84 @@ function figSVG(type,label,w){
 function drawFig(svg,type,label,k){
  const {P,A,B}=figSVG(type),J={};
  for(const j in A)J[j]=[A[j][0]+(B[j][0]-A[j][0])*k,A[j][1]+(B[j][1]-A[j][1])*k];
- const hl=s=>P.hl.includes(s);
- const ln=(a,b,w,c,o)=>`<line x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${b[0].toFixed(1)}" y2="${b[1].toFixed(1)}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"${o?` opacity="${o}"`:""}/>`;
- const limb=(a,b,w,c,glow)=>ln(a,b,w+4,OUT)+ln(a,b,w,c)+(glow?ln(a,b,w,HL,.55+.45*k):"");
- const far=([x,y])=>[x+6,y-3];
- let o=`<defs><filter id="gl" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
- <rect width="200" height="160" fill="#1a1f2b"/><rect y="151" width="200" height="9" fill="#232a38"/>`;
- const pr=P.p;
- if(pr.includes("bench"))o+=`<rect x="34" y="112" width="96" height="7" rx="3" fill="#4a5366"/><rect x="44" y="119" width="5" height="32" fill="#4a5366"/><rect x="116" y="119" width="5" height="32" fill="#4a5366"/>`;
- if(pr.includes("seat"))o+=`<rect x="68" y="114" width="42" height="7" rx="3" fill="#4a5366"/><rect x="72" y="48" width="7" height="68" rx="3" fill="#4a5366"/><rect x="87" y="121" width="5" height="30" fill="#4a5366"/>`;
- if(pr.includes("recline"))o+=`<line x1="32" y1="78" x2="90" y2="128" stroke="#4a5366" stroke-width="9" stroke-linecap="round"/>`;
- if(pr.includes("bike"))o+=`<circle cx="128" cy="134" r="13" fill="none" stroke="#4a5366" stroke-width="4"/><line x1="132" y1="74" x2="128" y2="134" stroke="#4a5366" stroke-width="5"/>`;
- if(pr.includes("benchshort"))o+=`<rect x="26" y="106" width="44" height="8" rx="3" fill="#4a5366"/><rect x="34" y="114" width="5" height="37" fill="#4a5366"/><rect x="58" y="114" width="5" height="37" fill="#4a5366"/>`;
- if(pr.includes("chair"))o+=`<rect x="54" y="104" width="38" height="7" rx="3" fill="#4a5366"/><rect x="56" y="111" width="5" height="40" fill="#4a5366"/><rect x="85" y="111" width="5" height="40" fill="#4a5366"/><rect x="54" y="62" width="6" height="44" rx="3" fill="#4a5366"/>`;
- if(pr.includes("wall"))o+=`<rect x="70" y="10" width="10" height="141" fill="#3a4252"/>`;
- if(pr.includes("table"))o+=`<rect x="30" y="56" width="84" height="7" rx="2" fill="#7a5a3a"/><rect x="34" y="63" width="5" height="88" fill="#5e4329"/><rect x="106" y="63" width="5" height="88" fill="#5e4329"/>`;
- if(pr.includes("post"))o+=`<rect x="134" y="20" width="10" height="131" rx="3" fill="#4a5366"/>`;
- if(pr.includes("towel"))o+=`<rect x="${J.ft[0]-12}" y="146" width="26" height="5" rx="2" fill="#5eb3e8"/>`;
- if(pr.includes("towel2"))o+=`<rect x="78" y="144" width="30" height="6" rx="2" fill="#5eb3e8"/>`;
- if(P.c)o+=ln(P.c,J.ha,2,"#8a93a6");
- o+=`<ellipse cx="${(J.hp[0]+J.ft[0])/2}" cy="152" rx="36" ry="3.5" fill="#000" opacity=".4"/>`;
- // lado lejano (más oscuro)
- o+=limb(far(J.hp),far(J.kn),11,hl("th")?"#b0491c":SHORT)+limb(far(J.kn),far(J.ft),8,hl("sn")?"#b0491c":SKIN2);
- o+=limb(far(J.sh),far(J.el),8,hl("ua")?"#b0491c":SHIRT2)+limb(far(J.el),far(J.ha),7,SKIN2);
- // torso (playera)
- const dx=J.hp[0]-J.sh[0],dy=J.hp[1]-J.sh[1],L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
- const tp=[[J.sh[0]+nx*11,J.sh[1]+ny*11],[J.sh[0]-nx*11,J.sh[1]-ny*11],[J.hp[0]-nx*8,J.hp[1]-ny*8],[J.hp[0]+nx*8,J.hp[1]+ny*8]];
- const tpath=`M${tp.map(p=>p.map(v=>v.toFixed(1)).join(" ")).join(" L")} Z`;
- o+=`<path d="${tpath}" fill="${SHIRT}" stroke="${OUT}" stroke-width="3" stroke-linejoin="round"/>`;
- if(hl("to"))o+=`<path d="${tpath}" fill="${HL}" opacity="${.5+.45*k}" filter="url(#gl)"/>`;
- // short + pierna cercana
- o+=limb(J.hp,J.kn,13,hl("th")?HL:SHORT,0)+limb(J.kn,J.ft,9,hl("sn")?HL:SKIN);
- o+=`<path d="M${J.ft[0]-4} ${J.ft[1]+1} h15" stroke="${OUT}" stroke-width="9" stroke-linecap="round"/><path d="M${J.ft[0]-4} ${J.ft[1]+1} h15" stroke="#f5f5f5" stroke-width="6" stroke-linecap="round"/>`;
+ const hl=s=>P.hl.includes(s),uid=svg.id||"t"+Math.random().toString(36).slice(2,7);
+ const F=v=>v.toFixed(1);
+ // cápsula con grosor distinto en cada extremo (forma de músculo)
+ const cap=(a,b,r1,r2,fill,extra)=>{const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
+  const a1=[a[0]+nx*r1,a[1]+ny*r1],a2=[a[0]-nx*r1,a[1]-ny*r1],b1=[b[0]+nx*r2,b[1]+ny*r2],b2=[b[0]-nx*r2,b[1]-ny*r2];
+  return `<path d="M${F(a1[0])} ${F(a1[1])} L${F(b1[0])} ${F(b1[1])} A${r2} ${r2} 0 0 0 ${F(b2[0])} ${F(b2[1])} L${F(a2[0])} ${F(a2[1])} A${r1} ${r1} 0 0 0 ${F(a1[0])} ${F(a1[1])} Z" fill="${fill}" stroke="#0b0d11" stroke-width="2.2" stroke-linejoin="round" ${extra||""}/>`};
+ // brillo sobre la extremidad (da volumen)
+ const shine=(a,b,r)=>{const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1,nx=-dy/L*r*.45,ny=dx/L*r*.45;
+  return `<line x1="${F(a[0]+nx+dx*.15)}" y1="${F(a[1]+ny+dy*.15)}" x2="${F(b[0]+nx-dx*.15)}" y2="${F(b[1]+ny-dy*.15)}" stroke="#fff" stroke-opacity=".28" stroke-width="${Math.max(1.5,r*.35)}" stroke-linecap="round"/>`};
+ const g=n=>`url(#${n}${uid})`;
+ let o=`<defs>
+ <radialGradient id="bg${uid}" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="#26304a"/><stop offset="1" stop-color="#141821"/></radialGradient>
+ <linearGradient id="sk${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd8b4"/><stop offset=".55" stop-color="#e9b48a"/><stop offset="1" stop-color="#b9805a"/></linearGradient>
+ <linearGradient id="skd${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9926b"/><stop offset="1" stop-color="#8a5c3f"/></linearGradient>
+ <linearGradient id="sh${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6aa0ef"/><stop offset=".6" stop-color="#3567c0"/><stop offset="1" stop-color="#1f4387"/></linearGradient>
+ <linearGradient id="shd${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2c5299"/><stop offset="1" stop-color="#173163"/></linearGradient>
+ <linearGradient id="pa${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4b5363"/><stop offset="1" stop-color="#1c2028"/></linearGradient>
+ <linearGradient id="pad${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#30353f"/><stop offset="1" stop-color="#15181e"/></linearGradient>
+ <linearGradient id="hl${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb07a"/><stop offset=".5" stop-color="#ff6b2c"/><stop offset="1" stop-color="#c2410c"/></linearGradient>
+ <radialGradient id="hd${uid}" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#ffe0c2"/><stop offset=".7" stop-color="#e9b48a"/><stop offset="1" stop-color="#b9805a"/></radialGradient>
+ <linearGradient id="me${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e3e7ee"/><stop offset="1" stop-color="#8d95a5"/></linearGradient>
+ <filter id="gl${uid}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter id="sd${uid}"><feGaussianBlur stdDeviation="2.5"/></filter>
+ </defs><rect width="200" height="160" fill="${g("bg")}"/><rect y="151" width="200" height="9" fill="#202634"/><line x1="0" y1="151" x2="200" y2="151" stroke="#2f3747"/>`;
+ const pr=P.p,furn="#4a5366",fs='stroke="#0b0d11" stroke-width="1.5"';
+ if(pr.includes("bench"))o+=`<rect x="34" y="112" width="96" height="7" rx="3" fill="${furn}" ${fs}/><rect x="44" y="119" width="5" height="32" fill="${furn}"/><rect x="116" y="119" width="5" height="32" fill="${furn}"/>`;
+ if(pr.includes("benchshort"))o+=`<rect x="26" y="106" width="44" height="8" rx="3" fill="${furn}" ${fs}/><rect x="34" y="114" width="5" height="37" fill="${furn}"/><rect x="58" y="114" width="5" height="37" fill="${furn}"/>`;
+ if(pr.includes("seat"))o+=`<rect x="68" y="114" width="42" height="7" rx="3" fill="${furn}" ${fs}/><rect x="72" y="48" width="7" height="68" rx="3" fill="${furn}" ${fs}/><rect x="87" y="121" width="5" height="30" fill="${furn}"/>`;
+ if(pr.includes("chair"))o+=`<rect x="54" y="104" width="38" height="7" rx="3" fill="#7a5a3a" ${fs}/><rect x="56" y="111" width="5" height="40" fill="#5e4329"/><rect x="85" y="111" width="5" height="40" fill="#5e4329"/><rect x="54" y="62" width="6" height="44" rx="3" fill="#7a5a3a" ${fs}/>`;
+ if(pr.includes("wall"))o+=`<rect x="68" y="6" width="12" height="145" fill="#3a4252" ${fs}/>`;
+ if(pr.includes("table"))o+=`<rect x="30" y="56" width="84" height="7" rx="2" fill="#8a6440" ${fs}/><rect x="34" y="63" width="5" height="88" fill="#5e4329"/><rect x="106" y="63" width="5" height="88" fill="#5e4329"/>`;
+ if(pr.includes("post"))o+=`<rect x="134" y="20" width="10" height="131" rx="3" fill="${furn}" ${fs}/>`;
+ if(pr.includes("recline"))o+=`<line x1="32" y1="78" x2="90" y2="128" stroke="${furn}" stroke-width="9" stroke-linecap="round"/>`;
+ if(pr.includes("bike"))o+=`<circle cx="128" cy="134" r="13" fill="none" stroke="${furn}" stroke-width="4"/><line x1="132" y1="74" x2="128" y2="134" stroke="${furn}" stroke-width="5"/>`;
+ if(pr.includes("towel"))o+=`<rect x="${F(J.ft[0]-13)}" y="145" width="28" height="6" rx="2" fill="#5eb3e8" ${fs}/>`;
+ if(pr.includes("towel2"))o+=`<rect x="78" y="144" width="30" height="7" rx="2" fill="#5eb3e8" ${fs}/>`;
+ if(P.c)o+=`<line x1="${P.c[0]}" y1="${P.c[1]}" x2="${F(J.ha[0])}" y2="${F(J.ha[1])}" stroke="#9aa3b5" stroke-width="1.6"/>`;
+ o+=`<ellipse cx="${F((J.hp[0]+J.ft[0])/2)}" cy="152" rx="38" ry="4" fill="#000" opacity=".55" filter="${g("sd")}"/>`;
+ const far=([x,y])=>[x+6,y-3],gw=`filter="${g("gl")}"`;
+ // lado lejano
+ o+=cap(far(J.hp),far(J.kn),7,5.5,hl("th")?"#b0491c":g("pad"))+cap(far(J.kn),far(J.ft),5,3.5,hl("sn")?"#b0491c":g("skd"));
+ o+=cap(far(J.sh),far(J.el),5.5,4.5,hl("ua")?"#b0491c":g("shd"))+cap(far(J.el),far(J.ha),4.2,3.2,g("skd"));
+ // torso con pecho y cintura
+ const dx=J.hp[0]-J.sh[0],dy=J.hp[1]-J.sh[1],L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L,ux=dx/L,uy=dy/L;
+ const P1=[J.sh[0]+nx*12-ux*3,J.sh[1]+ny*12-uy*3],P2=[J.sh[0]-nx*12-ux*3,J.sh[1]-ny*12-uy*3],P3=[J.hp[0]-nx*8.5,J.hp[1]-ny*8.5],P4=[J.hp[0]+nx*8.5,J.hp[1]+ny*8.5];
+ const C1=[(P2[0]+P3[0])/2-nx*3,(P2[1]+P3[1])/2-ny*3],C2=[(P4[0]+P1[0])/2+nx*3,(P4[1]+P1[1])/2+ny*3];
+ const tor=`M${F(P1[0])} ${F(P1[1])} Q${F(J.sh[0]-ux*8)} ${F(J.sh[1]-uy*8)} ${F(P2[0])} ${F(P2[1])} Q${F(C1[0])} ${F(C1[1])} ${F(P3[0])} ${F(P3[1])} L${F(P4[0])} ${F(P4[1])} Q${F(C2[0])} ${F(C2[1])} ${F(P1[0])} ${F(P1[1])} Z`;
+ o+=`<path d="${tor}" fill="${hl("to")?g("hl"):g("sh")}" stroke="#0b0d11" stroke-width="2.4" stroke-linejoin="round" ${hl("to")?gw:""}/>`;
+ o+=`<path d="M${F(J.sh[0]+nx*6+ux*6)} ${F(J.sh[1]+ny*6+uy*6)} Q${F(J.sh[0]+nx*9+ux*18)} ${F(J.sh[1]+ny*9+uy*18)} ${F(J.sh[0]+nx*5+ux*30)} ${F(J.sh[1]+ny*5+uy*30)}" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="3" stroke-linecap="round"/>`;
+ // pierna cercana: short + pantorrilla
+ o+=cap(J.hp,J.kn,8.5,6.5,hl("th")?g("hl"):g("pa"),hl("th")?gw:"")+shine(J.hp,J.kn,8);
+ o+=cap(J.kn,J.ft,6,4,hl("sn")?g("hl"):g("sk"),hl("sn")?gw:"")+shine(J.kn,J.ft,5);
+ o+=`<ellipse cx="${F(J.ft[0]+4)}" cy="${F(J.ft[1]+.5)}" rx="9" ry="4" fill="#f4f4f4" stroke="#0b0d11" stroke-width="2"/><path d="M${F(J.ft[0]-4)} ${F(J.ft[1]+3)} h16" stroke="#ff6b2c" stroke-width="2"/>`;
  // cuello y cabeza
- const nk=[J.sh[0]+(J.hd[0]-J.sh[0])*.5,J.sh[1]+(J.hd[1]-J.sh[1])*.5];
- o+=limb(J.sh,nk,7,SKIN);
- o+=`<circle cx="${J.hd[0]}" cy="${J.hd[1]}" r="12" fill="${SKIN}" stroke="${OUT}" stroke-width="3"/><path d="M${J.hd[0]-12} ${J.hd[1]-1} A12 12 0 0 1 ${J.hd[0]+11} ${J.hd[1]-5} Z" fill="#2b2118"/><circle cx="${J.hd[0]+5}" cy="${J.hd[1]+1}" r="1.7" fill="${OUT}"/>`;
- // brazo cercano: manga + antebrazo (con contorno para separarlo del cuerpo)
- const mid=[J.sh[0]+(J.el[0]-J.sh[0])*.45,J.sh[1]+(J.el[1]-J.sh[1])*.45];
- o+=limb(J.sh,J.el,10,hl("ua")?HL:SKIN,0)+ln(J.sh,mid,10,hl("ua")?HL:SHIRT)+limb(J.el,J.ha,8,hl("fa")?HL:SKIN);
- // músculo que se infla
+ const nk=[J.sh[0]+(J.hd[0]-J.sh[0])*.55,J.sh[1]+(J.hd[1]-J.sh[1])*.55];
+ o+=cap(J.sh,nk,4.5,4,g("sk"));
+ o+=`<circle cx="${F(J.hd[0])}" cy="${F(J.hd[1])}" r="11.5" fill="${g("hd")}" stroke="#0b0d11" stroke-width="2.4"/>
+ <path d="M${F(J.hd[0]-11.5)} ${F(J.hd[1]-1)} A11.5 11.5 0 0 1 ${F(J.hd[0]+10.5)} ${F(J.hd[1]-5)} Q${F(J.hd[0])} ${F(J.hd[1]-6)} ${F(J.hd[0]-11.5)} ${F(J.hd[1]-1)} Z" fill="#2b2118" stroke="#0b0d11" stroke-width="1.5"/>
+ <circle cx="${F(J.hd[0]+5.5)}" cy="${F(J.hd[1]+1)}" r="1.6" fill="#0b0d11"/><path d="M${F(J.hd[0]+4)} ${F(J.hd[1]+6)} q2.5 1.5 5 0" stroke="#0b0d11" stroke-width="1.2" fill="none"/>
+ <circle cx="${F(J.hd[0]-3)}" cy="${F(J.hd[1]+2)}" r="2.6" fill="#e9a07a" stroke="#0b0d11" stroke-width="1"/>`;
+ // brazo cercano: manga corta + antebrazo
+ const mid=[J.sh[0]+(J.el[0]-J.sh[0])*.42,J.sh[1]+(J.el[1]-J.sh[1])*.42];
+ o+=cap(J.sh,J.el,6.5,5,hl("ua")?g("hl"):g("sk"),hl("ua")?gw:"")+shine(J.sh,J.el,6);
+ if(!hl("ua"))o+=cap(J.sh,mid,7.5,6.8,g("sh"));
+ o+=cap(J.el,J.ha,5,3.8,hl("fa")?g("hl"):g("sk"),hl("fa")?gw:"")+shine(J.el,J.ha,4.5);
+ // bulto muscular que se infla al contraer
  for(const s of ["ua","th"]){if(!hl(s))continue;const a=J[s==="ua"?"sh":"hp"],b=J[s==="ua"?"el":"kn"];
   const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2,ang=Math.atan2(b[1]-a[1],b[0]-a[0])*180/Math.PI,L2=Math.hypot(b[0]-a[0],b[1]-a[1]);
-  o+=`<ellipse cx="${mx}" cy="${my}" rx="${L2/2.8}" ry="${(s==="th"?7.5:6)+2.5*k}" transform="rotate(${ang} ${mx} ${my})" fill="${HL}" stroke="${OUT}" stroke-width="2" filter="url(#gl)"/>`}
- o+=`<circle cx="${J.ha[0]}" cy="${J.ha[1]}" r="4.5" fill="${SKIN}" stroke="${OUT}" stroke-width="2"/>`;
- const h=J.ha,f=J.ft;
- if(pr.includes("db"))o+=`<rect x="${h[0]-10}" y="${h[1]-2}" width="20" height="4" fill="#c9ced8" stroke="${OUT}" stroke-width="1"/><rect x="${h[0]-14}" y="${h[1]-7}" width="6" height="14" rx="2" fill="#6b7385" stroke="${OUT}" stroke-width="1.5"/><rect x="${h[0]+8}" y="${h[1]-7}" width="6" height="14" rx="2" fill="#6b7385" stroke="${OUT}" stroke-width="1.5"/>`;
- if(pr.includes("handle"))o+=`<rect x="${h[0]-3}" y="${h[1]-8}" width="6" height="16" rx="2" fill="#c9ced8" stroke="${OUT}" stroke-width="1.5"/>`;
- if(pr.includes("bar"))o+=`<rect x="${h[0]-24}" y="${h[1]-2.5}" width="48" height="5" rx="2" fill="#c9ced8" stroke="${OUT}" stroke-width="1.5"/>`;
- if(pr.includes("plate"))o+=`<line x1="${f[0]+6}" y1="${f[1]-22}" x2="${f[0]+6}" y2="${f[1]+22}" stroke="#c9ced8" stroke-width="6" stroke-linecap="round"/>`;
- if(pr.includes("pad"))o+=`<circle cx="${f[0]}" cy="${f[1]}" r="6" fill="#6b7385" stroke="${OUT}" stroke-width="1.5"/>`;
- if(label)o+=`<rect x="52" y="4" width="96" height="15" rx="7.5" fill="#0f1115" opacity=".75"/><text x="100" y="14.5" text-anchor="middle" fill="${HL}" font-size="8.5" font-weight="800" font-family="Inter">● ${label}</text>`;
+  o+=`<ellipse cx="${F(mx)}" cy="${F(my)}" rx="${F(L2/2.8)}" ry="${F((s==="th"?7.5:6)+2.5*k)}" transform="rotate(${F(ang)} ${F(mx)} ${F(my)})" fill="${g("hl")}" stroke="#0b0d11" stroke-width="2" ${gw}/>
+  <ellipse cx="${F(mx-2)}" cy="${F(my-2)}" rx="${F(L2/6)}" ry="2" transform="rotate(${F(ang)} ${F(mx)} ${F(my)})" fill="#fff" opacity=".35"/>`}
+ o+=`<circle cx="${F(J.ha[0])}" cy="${F(J.ha[1])}" r="4.6" fill="${g("sk")}" stroke="#0b0d11" stroke-width="2"/>`;
+ const h=J.ha,f=J.ft,ms=`stroke="#0b0d11" stroke-width="1.5"`;
+ if(pr.includes("db"))o+=`<rect x="${F(h[0]-10)}" y="${F(h[1]-2)}" width="20" height="4" fill="${g("me")}" ${ms}/><rect x="${F(h[0]-15)}" y="${F(h[1]-7.5)}" width="7" height="15" rx="2" fill="#5b6375" ${ms}/><rect x="${F(h[0]+8)}" y="${F(h[1]-7.5)}" width="7" height="15" rx="2" fill="#5b6375" ${ms}/>`;
+ if(pr.includes("handle"))o+=`<rect x="${F(h[0]-3)}" y="${F(h[1]-8)}" width="6" height="16" rx="2" fill="${g("me")}" ${ms}/>`;
+ if(pr.includes("bar"))o+=`<rect x="${F(h[0]-24)}" y="${F(h[1]-2.5)}" width="48" height="5" rx="2" fill="${g("me")}" ${ms}/>`;
+ if(pr.includes("plate"))o+=`<rect x="${F(f[0]+3)}" y="${F(f[1]-22)}" width="7" height="44" rx="3" fill="${g("me")}" ${ms}/>`;
+ if(pr.includes("pad"))o+=`<circle cx="${F(f[0])}" cy="${F(f[1])}" r="6" fill="#5b6375" ${ms}/>`;
+ if(label)o+=`<rect x="50" y="4" width="100" height="15" rx="7.5" fill="#0f1115" opacity=".8"/><text x="100" y="14.5" text-anchor="middle" fill="#ff8a50" font-size="8.5" font-weight="800" font-family="Inter">● ${label}</text>`;
  svg.innerHTML=o;
 }
 function startFig(type,label){
@@ -554,49 +578,34 @@ async function notify(title,body){
   const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();
   if(reg)reg.showNotification(title,{body,icon:"icon-192.png",badge:"icon-192.png"});else new Notification(title,{body});}catch(e){}
 }
-function show(id){["sPick","sPin","sReg"].forEach(s=>$(s).classList.toggle("off",s!==id));const inApp=!id;$("app").style.display=inApp?"block":"none";$("nav").style.display=inApp?"flex":"none";if(!inApp)stopRest()}
+function show(id){["sPick","sReg"].forEach(s=>$(s).classList.toggle("off",s!==id));const inApp=!id;$("app").style.display=inApp?"block":"none";$("nav").style.display=inApp?"flex":"none";if(!inApp)stopRest()}
 
-// ================== PERFILES ==================
-let USERS=store.get("dojo_users",[]);
-async function loadPicker(){
- show("sPick");renderPicker();
- try{const j=await api("list");USERS=j.users;store.set("dojo_users",USERS);renderPicker()}
- catch(e){if(!USERS.length)$("pgrid").innerHTML=`<div class="note" style="grid-column:span 2">No hay conexión con el servidor. Revisa tu internet.</div>`}
+// ================== ENTRAR ==================
+let KNOWN=store.get("dojo_known",[]);
+function loadPicker(){show("sPick");renderKnown()}
+function renderKnown(){const k=$("known");
+ k.innerHTML=KNOWN.length?`<p class="sub" style="margin-top:22px">Cuentas en este celular</p><div class="pgrid" style="margin-top:10px">${KNOWN.map((u,i)=>`<button class="pc" data-k="${i}"><div class="big" style="background:${u.color||COLORS[0]}">${esc(String(u.nombre)[0]).toUpperCase()}</div><b>${esc(String(u.nombre).split(" ")[0])}</b><small>${store.get("dojo_auth_"+u.id,null)?"Entrar directo":"Pide PIN"}</small></button>`).join("")}</div>`:"";
+ k.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{const u=KNOWN[+b.dataset.k],h=store.get("dojo_auth_"+u.id,null);if(h)return silentLogin(u,h);$("lId").value=u.ident||u.nombre;$("lPin").focus()});
 }
-function renderPicker(){
- const g=$("pgrid");
- g.innerHTML=USERS.map((u,i)=>`<button class="pc" data-p="${esc(u.id)}"><div class="big" style="background:${u.color||COLORS[i%8]}">${esc(String(u.nombre)[0]||"?").toUpperCase()}</div><b>${esc(u.nombre)}</b><small>${PHASES[+u.fase||0].ic} ${PHASES[+u.fase||0].n} · ${u.lugar==="gym"?"Gimnasio":"Casa"}</small></button>`).join("")+
- `<button class="pc new" id="pnew"><div class="big">+</div><b>Soy nuevo</b><small>Crear mi perfil</small></button>`;
- g.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>pickUser(USERS.find(u=>String(u.id)===b.dataset.p)));
- $("pnew").onclick=()=>startReg();
-}
-function pickUser(u){
- const saved=store.get("dojo_auth_"+u.id,null);
- if(saved){return doLogin(u,saved,true)}
- PIN.u=u;PIN.v="";show("sPin");$("pinName").textContent=u.nombre;$("pinAv").textContent=String(u.nombre)[0].toUpperCase();$("pinAv").style.background=u.color||COLORS[0];drawDots();
-}
-const PIN={u:null,v:""};
-$("pinPad").innerHTML=[1,2,3,4,5,6,7,8,9,"",0,"⌫"].map(n=>n===""?"<span></span>":`<button data-n="${n}">${n}</button>`).join("");
-$("pinPad").querySelectorAll("button").forEach(b=>b.onclick=async()=>{
- vib(8);const n=b.dataset.n;if(n==="⌫")PIN.v=PIN.v.slice(0,-1);else if(PIN.v.length<4)PIN.v+=n;drawDots();
- if(PIN.v.length===4){const h=await pinHashOf(PIN.u.nombre,PIN.v);doLogin(PIN.u,h,false)}
-});
-function drawDots(){[...$("pinDots").children].forEach((d,i)=>d.classList.toggle("f",i<PIN.v.length))}
-$("pinBack").onclick=()=>loadPicker();
-async function doLogin(u,hash,silent){
+function remember(u,ident){KNOWN=KNOWN.filter(x=>x.id!==u.id);KNOWN.unshift({id:u.id,nombre:u.nombre,color:u.color,ident});store.set("dojo_known",KNOWN.slice(0,6))}
+$("lGo").onclick=async()=>{
+ const id=$("lId").value.trim(),pin=$("lPin").value.trim();
+ if(!id)return toast("Escribe tu celular, correo o nombre");if(!/^\d{4}$/.test(pin))return toast("El PIN es de 4 números");
+ const b=$("lGo");b.disabled=true;b.textContent="Entrando…";
+ try{const j=await api("login2",{ident:id,pin});if($("remember").checked)store.set("dojo_auth_"+j.user.id,j.pinHash);remember(j.user,id);$("lPin").value="";enter(j,j.pinHash)}
+ catch(e){toast(esc(e.message));$("lPin").value="";$("lPin").classList.add("shake");vib([60,40,60]);setTimeout(()=>$("lPin").classList.remove("shake"),450)}
+ finally{b.disabled=false;b.textContent="Entrar"}
+};
+$("lPin").onkeydown=e=>{if(e.key==="Enter")$("lGo").click()};
+async function silentLogin(u,hash){
  const cache=store.get("dojo_cache_"+u.id,null);
- try{
-  const j=await api("login",{id:u.id,pinHash:hash});
-  if(silent||$("remember").checked)store.set("dojo_auth_"+u.id,hash);
-  enter(j,hash);
- }catch(e){
-  if(/PIN/.test(e.message)){store.del("dojo_auth_"+u.id);
-   if(silent){PIN.u=u;PIN.v="";show("sPin");$("pinName").textContent=u.nombre;$("pinAv").textContent=String(u.nombre)[0];drawDots();return}
-   PIN.v="";drawDots();$("pinDots").classList.add("shake");vib([60,40,60]);setTimeout(()=>$("pinDots").classList.remove("shake"),450);toast("PIN incorrecto");return}
-  if(cache&&cache.hash===hash){toast("📴 Sin internet: usando datos guardados");enter(cache.data,hash)}
-  else toast("No se pudo conectar: "+esc(e.message));
+ try{const j=await api("login",{id:u.id,pinHash:hash});enter(j,hash)}
+ catch(e){
+  if(/PIN/.test(e.message)){store.del("dojo_auth_"+u.id);toast("Escribe tu PIN de nuevo");$("lId").value=u.ident||u.nombre;renderKnown();return}
+  if(cache&&cache.hash===hash){toast("📴 Sin internet: usando datos guardados");enter(cache.data,hash)}else toast("No se pudo conectar: "+esc(e.message));
  }
 }
+$("pnew").onclick=()=>startReg();
 function enter(j,hash){
  ME={user:j.user,pinHash:hash};SES={};
  (j.sesiones||[]).forEach(s=>{const f=String(s.fecha).slice(0,10);let det={};try{det=typeof s.detalle==="string"?JSON.parse(s.detalle||"{}"):s.detalle||{}}catch(e){}SES[f]={...s,fecha:f,detalle:det}});
@@ -636,6 +645,7 @@ function regRender(){
   ${REG.salud.some(c=>CAUTION.includes(c))?`<div class="tip w" style="margin-top:14px">⚠️ Con lo que marcaste, consulta a tu médico antes de empezar. La app usará intensidad moderada y quitará ejercicios de alto impacto.</div>`:`<p class="note" style="margin-top:12px">Si no tienes ninguna, solo dale Siguiente.</p>`}`,
  ()=>`<h2>Alimentación y avisos 🥗</h2><label>Preferencias de alimentación (opcional)</label>${chips("alimentacion",DIET,1)}
   <label style="display:block;margin-top:14px">Correo (opcional, para felicitaciones y recordatorios)</label><input id="rMail" type="email" value="${esc(REG.email||"")}" placeholder="tucorreo@gmail.com">
+  <label style="display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:12.5px;line-height:1.45;margin-bottom:12px"><input type="checkbox" id="rRank" ${REG.ranking!==false?"checked":""} style="width:auto;margin:2px 0 0;flex-shrink:0"> 🏆 Aparecer en el ranking del Dojo (solo se muestra tu nombre y tus rutinas cumplidas, nunca tu peso ni tu salud).</label>
   <label style="display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:12.5px;line-height:1.45"><input type="checkbox" id="rOk" ${REG.acepto?"checked":""} style="width:auto;margin:2px 0 0;flex-shrink:0"> Acepto que mis datos, incluida mi información de salud, se usen solo para personalizar mi plan en DojoApp. Entiendo que la app no sustituye la consulta médica.</label>`
  ];
  $("regBox").innerHTML=`<div class="dayh"><button class="link" style="margin:0" id="rBack">← ${regStep?"Atrás":"Salir"}</button><span class="note">${regStep+1} de ${N}</span></div>
@@ -650,12 +660,12 @@ function regRender(){
 function regSave(){const v=id=>$(id)?$(id).value.trim():undefined;
  if($("rNom")){REG.nombre=v("rNom");REG.telefono=v("rTel");REG.pin=v("rPin");REG.pin2=v("rPin2")}
  if($("rEdad")){REG.edad=v("rEdad");REG.estatura=v("rEst");REG.peso=v("rPeso");REG.cintura=v("rCin")}
- if($("rMail")){REG.email=v("rMail");REG.acepto=$("rOk").checked}}
+ if($("rMail")){REG.email=v("rMail");REG.acepto=$("rOk").checked;REG.ranking=$("rRank").checked}}
 async function regNext(){
  regSave();
  if(regStep===0){if(!REG.nombre)return toast("Escribe tu nombre");if(!/^\d{10}$/.test(REG.telefono||""))return toast("El celular debe tener 10 dígitos");
   if(!/^\d{4}$/.test(REG.pin||""))return toast("El PIN debe ser de 4 números");if(REG.pin!==REG.pin2)return toast("Los PIN no coinciden");
-  if(USERS.some(u=>String(u.nombre).trim().toLowerCase()===REG.nombre.toLowerCase()))return toast("Ya existe un perfil con ese nombre")}
+}
  if(regStep===1){const e=+REG.edad,h=+REG.estatura,w=+REG.peso;if(!(e>=12&&e<=90))return toast("Revisa tu edad");if(!(h>=1.2&&h<=2.2))return toast("Estatura en metros, ej. 1.70");if(!(w>=30&&w<=250))return toast("Revisa tu peso")}
  if(regStep===2&&!REG.objetivos.length)return toast("Elige al menos un objetivo");
  if(regStep===3&&!REG.diasSemana.length)return toast("Elige al menos un día para entrenar");
@@ -667,9 +677,9 @@ async function regNext(){
   const user={nombre:REG.nombre,telefono:REG.telefono,pinHash:hash,email:REG.email||"",edad:+REG.edad,sexo:REG.sexo,estatura:+REG.estatura,peso:+REG.peso,
    objetivos:objs.join(","),objetivo:objs[0],enfoque:REG.enfoque.join(","),lugar:REG.lugar,diasSemana:REG.diasSemana.map(Number).sort((a,b)=>a-b).join(","),dias:REG.diasSemana.length,
    nivel:REG.nivel,salud:REG.salud.join(","),limitaciones:REG.salud.join(","),alimentacion:REG.alimentacion.join(","),consentimiento:new Date().toISOString().slice(0,16),
-   faseInicio:todayISO(),color:COLORS[USERS.length%8]};
+   faseInicio:todayISO(),color:COLORS[Math.floor(Math.random()*8)],ranking:REG.ranking===false?"no":"si"};
   const j=await api("register",{user,cintura:REG.cintura});
-  store.set("dojo_auth_"+j.user.id,hash);USERS.push({id:j.user.id,nombre:j.user.nombre,color:j.user.color,fase:0,lugar:j.user.lugar});store.set("dojo_users",USERS);
+  store.set("dojo_auth_"+j.user.id,hash);remember(j.user,REG.telefono);
   if(!j.user.creado)j.user.creado=todayISO();
   enter(j,hash);confetti();
   setTimeout(()=>openSheet(`<div style="text-align:center"><div style="font-size:56px">🥋</div><h3>¡Bienvenido al Dojo, ${esc(j.user.nombre)}!</h3>
@@ -691,7 +701,7 @@ function phaseStatus(){
 function checkAdvance(){
  if(!ME)return false;
  const s=phaseStatus();if(!s.ready)return false;
- const u=ME.user,old=s.ph;u.fase=+u.fase===3?1:+u.fase+1;if(old.n==="Descarga")u.ciclo=(+u.ciclo||1)+1;u.faseInicio=iso(monday());
+ const u=ME.user,old=s.ph;u.fase=(+u.fase||0)===3?1:(+u.fase||0)+1;if(old.n==="Descarga")u.ciclo=(+u.ciclo||1)+1;u.faseInicio=iso(monday());
  send("updateUser",{fields:{fase:u.fase,ciclo:u.ciclo,faseInicio:u.faseInicio}});cacheMe();
  const np=PHASES[u.fase];confetti();vib([100,50,100,50,200]);notify("🏆 ¡Nueva fase desbloqueada!",`Superaste ${old.n}. Ahora: ${np.n}`);
  openSheet(`<div style="text-align:center;padding:6px"><div style="font-size:60px">🏆</div><h3>¡Fase ${old.n} superada!</h3>
@@ -753,7 +763,7 @@ function lastKg(id,before){
 
 // ================== TEMPORIZADOR ==================
 let rT=null,rLeft=0;
-function restSecs(){const u=ME.user,p=+u.fase,mo=mainObj(u);let s=p===2||mo==="fuerza"?120:mo==="grasa"||mo==="resistencia"?45:mo==="musculo"?90:60;return caution(u)?s+30:s}
+function restSecs(){const u=ME.user,p=(+u.fase||0),mo=mainObj(u);let s=p===2||mo==="fuerza"?120:mo==="grasa"||mo==="resistencia"?45:mo==="musculo"?90:60;return caution(u)?s+30:s}
 function beep(){try{const a=new(window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=880;o.connect(g);g.connect(a.destination);g.gain.value=.15;o.start();o.stop(a.currentTime+.4)}catch(e){}}
 function showRest(){$("rtm").textContent=Math.floor(Math.max(rLeft,0)/60)+":"+String(Math.max(rLeft,0)%60).padStart(2,"0");$("restbar").classList.toggle("end",rLeft<=0)}
 function startRest(){clearInterval(rT);rLeft=restSecs();$("restbar").classList.add("on");showRest();
@@ -764,7 +774,7 @@ $("rm").onclick=()=>{rLeft=Math.max(0,rLeft-15);showRest()};$("rp").onclick=()=>
 // ================== NAVEGACIÓN ==================
 function goView(v){document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("on",x.dataset.v===v));
  document.querySelectorAll(".view").forEach(x=>x.classList.toggle("on",x.id==="v-"+v));window.scrollTo(0,0);
- if(v==="prog")renderProg();if(v==="comida")renderFood();if(v==="perfil")renderPerfil();}
+ if(v==="prog")renderProg();if(v==="comida")renderFood();if(v==="rank")renderRank();if(v==="perfil")renderPerfil();}
 document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{vib(8);goView(b.dataset.v)});
 
 // ================== HOY ==================
@@ -783,7 +793,7 @@ function renderCoach(){
  else if(pend.length)msgs.push(["🔁",`Te quedó pendiente <b>${dayPlanSlot(pend[0].k).t}</b> del ${DN[dowOf(pend[0].f)-1].toLowerCase()}. Puedes hacerla hoy; el conteo se reinicia el lunes.`]);
  else if(tp.rest)msgs.push(["😴","Hoy es tu día de descanso. El músculo crece cuando descansas: camina 30 min y estira."]);
  else msgs.push(["💪",st>=2?`Racha de <b>${st} días</b>. ¡No la rompas hoy!`:`Hoy toca <b>${tp.t}</b>. Calienta 5 minutos y a darle.`]);
- if(s.meta&&s.days<s.meta)msgs.push(["🎯",`Te faltan <b>${s.meta-s.days} rutinas cumplidas</b> para desbloquear la fase ${PHASES[+u.fase===3?1:+u.fase+1].n}.`]);
+ if(s.meta&&s.days<s.meta)msgs.push(["🎯",`Te faltan <b>${s.meta-s.days} rutinas cumplidas</b> para desbloquear la fase ${PHASES[(+u.fase||0)===3?1:(+u.fase||0)+1].n}.`]);
  $("coach").innerHTML=`<div class="ic">🥋</div><div>${msgs.slice(0,2).map(m=>`<p>${m[0]} ${m[1]}</p>`).join('<div style="height:6px"></div>')}</div>`;
 }
 function dayPlanSlot(k){return buildDay(ME.user,k,ME.user.lugar||"casa")}
@@ -868,7 +878,7 @@ function renderProg(){
  <div class="card"><div class="dayh"><h2>${s.ph.ic} Fase ${s.ph.n}</h2><span class="tag">Ciclo ${u.ciclo||1} · Sem ${Math.min(s.weeks+1,s.need)}/${s.need}</span></div>
   <p class="note">${s.ph.d}</p>
   ${s.meta?`<div class="bar"><i style="width:${Math.min(100,s.days/s.meta*100)}%"></i></div><p class="note">Rutinas cumplidas en esta fase: <b style="color:var(--txt)">${s.days}/${s.meta}</b> · mínimo ${s.need} semanas</p>`:`<p class="note" style="margin-top:6px">Al terminar esta semana regresas a Volumen con más peso.</p>`}
-  <p class="note" style="margin-top:8px">Ruta: ${PHASES.map((p,i)=>`<span style="color:${i===+u.fase?"var(--acc)":i<+u.fase?"var(--ok)":"var(--mut)"}">${p.n}</span>`).join(" → ")}</p></div>
+  <p class="note" style="margin-top:8px">Ruta: ${PHASES.map((p,i)=>`<span style="color:${i===(+u.fase||0)?"var(--acc)":i<(+u.fase||0)?"var(--ok)":"var(--mut)"}">${p.n}</span>`).join(" → ")}</p></div>
  <div class="card"><div class="stats"><div><b>${streak()}🔥</b><span>Racha</span></div><div><b>${comp}</b><span>Días cumplidos</span></div><div><b>${series}</b><span>Series totales</span></div></div>
   <p class="note" style="margin-top:12px">Esta semana: <b style="color:var(--txt)">${wDone}/${wGoal}</b> rutinas ${wDone>=wGoal?"🏆":""}</p><div class="bar"><i style="width:${Math.min(100,wDone/wGoal*100)}%"></i></div></div>
  <div class="card"><div class="dayh"><button class="btn g sm" id="cPrev">‹</button><h2>${(s=>s[0].toUpperCase()+s.slice(1))(calM.toLocaleDateString("es-MX",{month:"long"}))} ${calM.getFullYear()}</h2><button class="btn g sm" id="cNext">›</button></div>
@@ -973,6 +983,7 @@ function renderPerfil(){
  <div class="card"><h2>🔔 Notificaciones</h2>
   <label style="margin-top:8px;display:block">Celular</label><input id="pTel" type="tel" inputmode="numeric" maxlength="10" value="${esc(u.telefono||"")}">
   <label>Correo para avisos</label><input id="pMail" type="email" value="${esc(u.email||"")}" placeholder="tucorreo@gmail.com">
+  <label style="display:flex;gap:10px;align-items:center;font-weight:400;font-size:13px;margin-bottom:12px"><input type="checkbox" id="pRank" ${u.ranking!=="no"?"checked":""} style="width:auto;margin:0"> 🏆 Aparecer en el ranking del Dojo</label>
   <button class="btn g w" id="pNot">${np==="granted"?"✅ Avisos en este celular activados":"Activar avisos en este celular"}</button>
   <p class="note" style="margin-top:8px">Por correo: felicitación al cumplir tu rutina y recordatorio a las 7 pm si te falta.</p></div>
  <div class="card"><h2>🔐 Seguridad</h2><label style="margin-top:8px;display:block">Nuevo PIN (4 dígitos)</label><input id="pPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••">
@@ -986,12 +997,27 @@ function renderPerfil(){
   if(!objs.length)return toast("Elige al menos un objetivo");if(!dias.length)return toast("Elige al menos un día");
   const tel=$("pTel").value.trim();if(tel&&!/^\d{10}$/.test(tel))return toast("El celular debe tener 10 dígitos");
   const f={objetivos:objs.join(","),objetivo:objs[0],diasSemana:dias.join(","),dias:dias.length,lugar:$("pLug").value,nivel:$("pNiv").value,
-   enfoque:sel("pFoc").join(","),salud:sel("pSal").join(","),limitaciones:sel("pSal").join(","),alimentacion:sel("pAli").join(","),email:$("pMail").value.trim(),telefono:tel};
+   enfoque:sel("pFoc").join(","),salud:sel("pSal").join(","),limitaciones:sel("pSal").join(","),alimentacion:sel("pAli").join(","),email:$("pMail").value.trim(),telefono:tel,ranking:$("pRank").checked?"si":"no"};
   Object.assign(ME.user,f);cacheMe();send("updateUser",{fields:f});render();toast("✅ Plan actualizado");goView("hoy")};
  $("pNot").onclick=async()=>{await askNotif();renderPerfil();if(window.Notification&&Notification.permission==="granted")notify("DojoApp","¡Listo! Así te avisaremos 💪")};
  $("pPinB").onclick=async()=>{const v=$("pPin").value;if(!/^\d{4}$/.test(v))return toast("El PIN debe ser de 4 números");
   const h=await pinHashOf(u.nombre,v);try{await api("updateUser",{...authed(),fields:{newPinHash:h}});ME.pinHash=h;store.set("dojo_auth_"+u.id,h);cacheMe();toast("🔐 PIN actualizado")}catch(e){toast("No se pudo: "+esc(e.message))}};
  $("pOut").onclick=logout;
+}
+
+// ================== RANKING ==================
+async function renderRank(){
+ const el=$("v-rank");el.innerHTML=`<div class="card"><p class="note">Cargando ranking…</p></div>`;
+ try{
+  const r=(await api("ranking",authed())).ranking,medal=["🥇","🥈","🥉"],last=r.length>=3?r[r.length-1]:null,lazy=last&&last.pct<60;
+  el.innerHTML=`<div class="card"><div class="dayh"><h2>🏆 Ranking del Dojo</h2><span class="tag">30 días</span></div>
+  <p class="note">Gana la constancia: % de rutinas cumplidas de las que cada quien programó. Nunca se muestra peso ni salud.</p></div>
+  <div class="card">${r.map((x,i)=>`<div class="rk ${x.yo?"me":""}"><div class="pos">${medal[i]||i+1}</div><div class="av" style="width:38px;height:38px;font-size:15px;background:${x.color||COLORS[0]}">${esc(String(x.nombre)[0])}</div>
+   <div style="flex:1;min-width:0"><b>${esc(x.nombre)}${x.yo?" (tú)":""}${lazy&&x===last?" 🦥":""}</b><div class="bar" style="margin:5px 0 3px"><i style="width:${x.pct}%;background:${x.pct>=80?"var(--ok)":x.pct>=50?"var(--warn)":"var(--acc)"}"></i></div>
+   <div class="note">${x.cum30} rutinas · semana ${x.sem}/${x.meta} · racha ${x.racha}🔥</div></div><div class="pct">${x.pct}%</div></div>`).join("")||'<p class="note">Aún no hay nadie en el ranking.</p>'}</div>
+  ${lazy?`<div class="card note">🦥 <b style="color:var(--txt)">${esc(last.nombre)}</b> va hasta abajo… ¡ánimo! Una rutina hoy y sube varios lugares.</div>`:""}
+  ${r.find(x=>x.yo&&x.oculto)?'<p class="note" style="text-align:center">Tienes el ranking desactivado: los demás no te ven. Actívalo en Perfil.</p>':""}`;
+ }catch(e){el.innerHTML=`<div class="card"><p class="note">No se pudo cargar el ranking: ${esc(e.message)}</p></div>`}
 }
 
 // ================== ADMIN ==================
