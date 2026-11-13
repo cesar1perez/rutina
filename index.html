@@ -719,16 +719,18 @@ function sideNote(id){
  return "";
 }
 // Ilustraciones profesionales (Everkinetic, CC BY-SA 4.0) · [inicio, final]
-const EKP=(n,ext)=>[`ek/${n}-1.${ext||"svg"}`,`ek/${n}-2.${ext||"svg"}`];
+const IMGDIR="";// las ilustraciones están en la raíz del repositorio
+const EKP=(n,ext)=>[`${IMGDIR}${n}-1.${ext||"svg"}`,`${IMGDIR}${n}-2.${ext||"svg"}`];
 const EKIMG={press:EKP("0055"),hexpress:EKP("0055"),inclinado:EKP("0061"),aperturas:EKP("0056"),pecdeck:EKP("0056"),lagartijas:EKP("0077"),diamante:EKP("0188"),maqpecho:EKP("0066"),
  remo:EKP("u435","webp"),remo2:EKP("u285","webp"),renegado:EKP("u553","webp"),pullover:EKP("0079"),superman:EKP("0105"),posterior:EKP("0032"),polea:EKP("0096"),remosent:EKP("0025"),
  curl:EKP("0224"),martillo:EKP("0227"),concentrado:EKP("0220"),predicador:EKP("0236"),curlinv:EKP("0257"),frances:EKP("0198"),patada:EKP("0204"),pushdown:EKP("0205"),
  hombro:EKP("0038"),arnold:EKP("0038"),laterales:EKP("0018"),goblet:EKP("0130"),pausa:EKP("0130"),sumo:EKP("0152"),zancada:EKP("0115"),inversa:EKP("0129"),bulgara:EKP("0129"),
  stepup:EKP("0137"),prensa:EKP("0127"),extension:EKP("0142"),puente:EKP("0109"),puente1:EKP("0109"),hipthrustg:EKP("0109"),kickback:EKP("0111"),patadapolea:EKP("0112"),
- rdl:EKP("0107"),femoral:EKP("0119"),pantorrilla:EKP("0275"),pantorrilla1:EKP("0275"),pantsent:EKP("0279"),plancha:["ek/0077-2.svg","ek/0077-2.svg"],planchalat:EKP("0113"),
+ rdl:EKP("0107"),femoral:EKP("0119"),pantorrilla:EKP("0275"),pantorrilla1:EKP("0275"),pantsent:EKP("0279"),plancha:[IMGDIR+"0077-2.svg",IMGDIR+"0077-2.svg"],planchalat:EKP("0113"),
  crunch:EKP("0289"),rusos:EKP("u740","webp"),elevpiernas:EKP("0021"),climber:EKP("u554","webp")};
 const GLBL={pecho:"pecho",espalda:"espalda",hombro:"hombro",biceps:"bíceps",triceps:"tríceps",cuad:"pierna (cuádriceps)",gluteo:"glúteo",femoral:"femoral",pantorrilla:"pantorrilla",core:"abdomen",cardio:"cardio"};
-function exThumb(id){const i=EKIMG[id];return i?`<img src="${i[1]}" alt="" loading="lazy">`:thumb(id)}
+window.__th=id=>thumb(id);
+function exThumb(id){const i=EKIMG[id];return i?`<img src="${i[1]}" alt="" loading="lazy" onerror="this.outerHTML=__th('${id}')">`:thumb(id)}
 // Cambios de ejercicio guardados por usuario
 function getSwaps(u){let a={},b={};try{a=JSON.parse((u||ME.user).cambios||"{}")}catch(e){}b=store.get("dojo_sw_"+(u||ME.user).id,{});return {...a,...b}}
 function setSwaps(o){ME.user.cambios=JSON.stringify(o);store.set("dojo_sw_"+ME.user.id,o);cacheMe();send("updateUser",{fields:{cambios:ME.user.cambios}})}
@@ -1084,7 +1086,7 @@ function updProg(ok,tot){const pct=tot?Math.round(ok/tot*100):0;if($("wbar"))$("
 function openEx(id){
  const e=EX[id],q=encodeURIComponent(e.n+" técnica correcta"),img=EKIMG[id];
  openSheet(`<div class="dayh"><h3>${e.n}</h3><button class="btn g sm" onclick="closeSheet()">✕</button></div><div class="exm">${e.m}</div>${sideNote(id)}
- ${img?`<div class="ekfig"><img src="${img[0]}" alt=""><img src="${img[1]}" class="b" alt=""></div><p class="note" style="text-align:center;margin:-4px 0 4px;font-size:11px">Posición inicial ⇄ final · Ilustración: Everkinetic (CC BY-SA 4.0)</p>`:""}
+ ${img?`<div class="ekfig"><img src="${img[0]}" alt="" onerror="this.closest('.ekfig').style.display='none'"><img src="${img[1]}" class="b" alt=""></div><p class="note" style="text-align:center;margin:-4px 0 4px;font-size:11px">Posición inicial ⇄ final · Ilustración: Everkinetic (CC BY-SA 4.0)</p>`:""}
  ${anatomyCard(id)}
  <ol>${e.s.map(s=>`<li>${s}</li>`).join("")}</ol><div class="tip">💡 ${e.t}</div>
  ${(+ME.user.edad>=45||caution(ME.user))?'<div class="tip w">⚠️ Prioriza técnica y rango controlado sobre el peso; respira normal, no aguantes el aire.</div>':""}
