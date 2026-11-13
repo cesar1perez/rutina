@@ -127,19 +127,39 @@ details.info{background:var(--card2);border-radius:12px;padding:10px 12px;margin
 body.resting{padding-bottom:220px}
 button,.set,.chip,.btn,.wd,.thumb{touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .ekfig{position:relative;background:#fff;border-radius:14px;margin:12px 0;height:260px;overflow:hidden}
-.ekfig img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:10px}
-.ekfig img.b{animation:xf 2.6s ease-in-out infinite}@keyframes xf{0%,30%{opacity:0}50%,80%{opacity:1}100%{opacity:0}}
+.ekfig{cursor:pointer}.ekfig .fr{position:absolute;inset:0;background:#fff}
+.ekfig .fr img{width:100%;height:100%;object-fit:contain;padding:12px 10px 22px}
+.ekfig .fr.b{animation:flip 3.2s infinite}
+@keyframes flip{0%,46%{opacity:0;transform:scale(.985)}50%,96%{opacity:1;transform:scale(1)}100%{opacity:0}}
+.ekfig.pause .fr.b{animation-play-state:paused}
+.ekfig .bdg{position:absolute;left:10px;top:10px;background:#0f1115;color:#fff;font:700 12px Inter;padding:4px 9px;border-radius:999px}
+.ekfig .fr.b .bdg{background:#e02424}
+.ekfig .hint{position:absolute;right:10px;bottom:6px;font-size:10.5px;color:#8a93a6}
+.strip{display:flex;align-items:center;gap:8px;margin:-4px 0 6px}.strip>div{flex:1;background:#fff;border-radius:10px;text-align:center;padding:4px}
+.strip img{width:100%;height:110px;object-fit:contain}.strip small{display:block;color:#333;font-size:11px;font-weight:700}.strip b{color:var(--acc);font-size:20px}
 .thumb img{width:100%;height:100%;object-fit:contain;background:#fff;padding:3px}
 .swapb{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:10px;width:40px;height:40px;font-size:17px;cursor:pointer;flex-shrink:0}
 .sidetag{display:inline-block;margin-top:5px;font-size:11.5px;font-weight:700;color:var(--warn);background:#2a1f0e;padding:3px 8px;border-radius:6px}
 .side{background:#2a1f0e;border-left:3px solid var(--warn);padding:8px 10px;border-radius:8px;font-size:13px;margin-top:10px}
 .swo{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+#splash{position:fixed;inset:0;z-index:100;background:radial-gradient(circle at 50% 20%,#3a1b08,#0f1115 60%);display:flex;align-items:center;justify-content:center;padding:28px;animation:fd .4s;cursor:pointer}
+#splash.out{opacity:0;transition:opacity .45s;pointer-events:none}
+#splash .sq{max-width:420px;text-align:center}
+#splash .qm{font:900 90px Georgia,serif;color:var(--acc);line-height:.6;margin-top:30px}
+#splash p{font-size:24px;font-weight:800;line-height:1.3;margin:10px 0 18px;letter-spacing:-.3px}
+#splash #qa{font-size:15px;font-weight:700;color:var(--acc)}
+#splash #qc{font-size:12px;color:var(--mut);margin:4px 0 26px}
+#splash small{display:block;color:var(--mut);margin-top:12px;font-size:11px}
 .rest{text-align:center;padding:24px 10px;color:var(--mut)}
 .link{background:none;border:0;color:var(--mut);font:600 13px Inter;cursor:pointer;text-decoration:underline;margin-top:22px}
 </style>
 </head>
 <body>
 
+<!-- ===== Frase del día ===== -->
+<div id="splash"><div class="sq"><div class="logo" style="font-size:30px">Dojo<span>App</span></div>
+ <div class="qm">“</div><p id="qt"></p><div id="qa"></div><div id="qc"></div>
+ <button class="btn" id="qgo">Vamos 💪</button><small>Toca para continuar</small></div></div>
 <!-- ===== Entrar ===== -->
 <div class="screen" id="sPick"><div class="center">
  <div class="logo">Dojo<span>App</span></div><p class="sub">Tu entrenador de bolsillo 🥋</p>
@@ -356,6 +376,12 @@ function list(v){return String(v||"").split(",").map(s=>s.trim()).filter(Boolean
 function mainObj(u){const o=list(u.objetivos||u.objetivo);return PRIO.find(p=>o.includes(p))||"salud"}
 function cond(u){return list(u.salud||u.limitaciones)}
 function caution(u){return cond(u).some(c=>CAUTION.includes(c))}
+// Edad: <18 adolescente (NSCA/OMS), 50-64, 65+ adulto mayor (OMS 2020 / ACSM)
+function ageG(u){const a=+(u||ME.user).edad||30;return a<18?"teen":a>=65?"mayor":a>=50?"50":"adulto"}
+const AVOID_MAYOR=["zancada","inversa","bulgara","thruster","swing","climber","rusos","elevpiernas","crunch","revcrunch","fondos","remo2","renegado","superman"];
+function avoidFor(u){const a=cond(u).flatMap(c=>AVOID[c]||[]);if(ageG(u)==="mayor")a.push(...AVOID_MAYOR);return new Set(a)}
+function poolFor(u,lugar){const P=POOL[lugar]||POOL.casa;if(ageG(u)!=="mayor")return P;
+ return {...P,cuad:lugar==="gym"?[...P.cuad,"sillapie"]:["sillapie",...P.cuad],cardio:["caminata",...(P.cardio||[])],equil:["equilibrio","talonpunta"]}}
 function trainDays(u){let d=list(u.diasSemana).map(Number).filter(x=>x>=1&&x<=7);
  if(!d.length)d={1:[1],2:[1,4],3:[1,3,5],4:[1,2,4,5],5:[1,2,3,4,5],6:[1,2,3,4,5,6],7:[1,2,3,4,5,6,7]}[+u.dias||4]||[1,2,4,5];
  return [...new Set(d)].sort((a,b)=>a-b)}
@@ -371,9 +397,13 @@ function splitFor(n,foc){
 function buildDay(u,slot,lugar){
  const days=trainDays(u),foc=list(u.enfoque),types=splitFor(days.length,foc),type=types[slot%types.length],T=DAYT[type];
  const variant=types.slice(0,slot).filter(x=>x===type).length,pi=+u.fase||0,ph=PHASES[pi];
- const avoid=new Set(cond(u).flatMap(c=>AVOID[c]||[])),pool=POOL[lugar]||POOL.casa;
+ const avoid=avoidFor(u),pool=poolFor(u,lugar),ag=ageG(u);
  const fg=new Set(foc.flatMap(f=>FOCMAP[f]||[])),mo=mainObj(u),careful=caution(u);
- let reps=(REPS[mo]||REPS.salud)[pi];if(careful)reps=pi===3?"12":"12-15";
+ let reps=(REPS[mo]||REPS.salud)[pi];
+ if(ag==="teen")reps=["12-15","10-12","8-12","12-15"][pi];
+ else if(ag==="mayor")reps=["10-15","10-12","8-12","12-15"][pi];
+ else if(ag==="50"&&/^(4|6)-/.test(reps))reps="8-10";
+ if(careful)reps=pi===3?"12":"12-15";
  const slots=[...T.s];let extra=0;
  [...fg].forEach(g=>{if(extra<2&&g!=="core"&&slots.includes(g)&&slots.length<8){slots.splice(slots.indexOf(g)+1,0,g);extra++}});
  if(fg.has("core")&&slots.filter(s=>s==="core").length<2)slots.push("core");
@@ -383,17 +413,22 @@ function buildDay(u,slot,lugar){
   const k=(occ[g]=(occ[g]||0)+1)-1,orig=p[(variant+(pi===1?1:0))%p.length];let id=orig;const sw=getSwaps(u)[orig];if(sw&&EX[sw]&&swOk(pool,g,sw)&&!avoid.has(sw)&&!used.has(sw))id=sw;used.add(id);
   let se=3,rp=TIMED[id]||(id==="lagartijas"?"máx":reps+(UNI.includes(id)?" por lado":""));
   if(id==="eliptica")se=1;
-  else{if(fg.has(g))se++;se+=ph.plus||0;if(u.nivel==="principiante"&&pi===0)se=Math.max(2,se-1);if(u.nivel==="avanzado")se++;if(ph.half)se=Math.max(1,Math.ceil(se/2))}
+  else if(id==="caminata")se=1;
+  else{if(fg.has(g))se++;se+=ph.plus||0;if(u.nivel==="principiante"&&pi===0)se=Math.max(2,se-1);if(u.nivel==="avanzado")se++;if(ag==="teen"||ag==="mayor")se=Math.min(se,3);if(ph.half)se=Math.max(1,Math.ceil(se/2))}
   x.push([id,se,rp,orig,g]);
  });
- const cap=u.nivel==="avanzado"?8:7;
+ const cap=(ag==="teen"||ag==="mayor")?6:u.nivel==="avanzado"?8:7;
  while(x.length>cap){let i=-1;for(let j=x.length-1;j>=3;j--){if(!fg.has(GRP[x[j][0]])&&GRP[x[j][0]]!=="core"){i=j;break}}
   if(i<0)for(let j=x.length-1;j>=3;j--){const g=GRP[x[j][0]];if(x.filter(r=>GRP[r[0]]===g).length>1){i=j;break}}
   x.splice(i<0?x.length-1:i,1)}
- const why=[T.porque,`Repeticiones de ${reps}: ${careful?"intensidad moderada por tus cuidados de salud":REPWHY[mo]}.`];
+ if(ag==="mayor"){const eq=pool.equil.filter(id=>!avoid.has(id)),o=eq[slot%eq.length];let id=o;const sw=getSwaps(u)[o];if(sw&&eq.includes(sw))id=sw;x.push([id,2,TIMED[id],o,"equil"])}
+ const why=[T.porque,`Repeticiones de ${reps}: ${careful?"intensidad moderada por tus cuidados de salud":ag==="teen"?"rango seguro para aprender técnica mientras creces":ag==="mayor"?"peso moderado que fortalece sin forzar articulaciones":REPWHY[mo]}.`];
+ if(ag==="teen")why.push("Tienes menos de 18 años: máximo 3 series, nada de levantar tu máximo y primero la técnica (NSCA). La OMS recomienda además 60 min de actividad al día, como deporte o juego. En el gym entrena con supervisión de un entrenador y con permiso de tus papás o tutor.");
+ if(ag==="mayor")why.push("Por tu edad (65+): se quitaron saltos, giros de tronco y ejercicios con riesgo de caída, y se agregó un ejercicio de equilibrio al final. La OMS recomienda equilibrio y fuerza 3 días por semana para prevenir caídas.");
+ if(ag==="50")why.push("Pasados los 50 la rutina no baja de 8 repeticiones: fuerza real con técnica que cuida tus articulaciones.");
  const fx=foc.filter(f=>(FOCMAP[f]||[]).some(g=>T.s.includes(g)));
  if(fx.length)why.push(`Lleva series extra de ${fx.map(f=>FOCUS.find(z=>z[0]===f)[1].toLowerCase()).join(", ")} porque lo marcaste como enfoque.`);
- if(avoid.size)why.push("Se quitaron los ejercicios de riesgo según tus cuidados de salud.");
+ if(cond(u).some(c=>AVOID[c]))why.push("Se quitaron los ejercicios de riesgo según tus cuidados de salud.");
  return {type,t:T.t,logro:T.logro,why,x,lugar};
 }
 
@@ -728,7 +763,7 @@ const EKIMG={press:EKP("0055"),hexpress:EKP("0055"),inclinado:EKP("0061"),apertu
  stepup:EKP("0137"),prensa:EKP("0127"),extension:EKP("0142"),puente:EKP("0109"),puente1:EKP("0109"),hipthrustg:EKP("0109"),kickback:EKP("0111"),patadapolea:EKP("0112"),
  rdl:EKP("0107"),femoral:EKP("0119"),pantorrilla:EKP("0275"),pantorrilla1:EKP("0275"),pantsent:EKP("0279"),plancha:[IMGDIR+"0077-2.svg",IMGDIR+"0077-2.svg"],planchalat:EKP("0113"),
  crunch:EKP("0289"),rusos:EKP("u740","webp"),elevpiernas:EKP("0021"),climber:EKP("u554","webp")};
-const GLBL={pecho:"pecho",espalda:"espalda",hombro:"hombro",biceps:"bíceps",triceps:"tríceps",cuad:"pierna (cuádriceps)",gluteo:"glúteo",femoral:"femoral",pantorrilla:"pantorrilla",core:"abdomen",cardio:"cardio"};
+const GLBL={pecho:"pecho",espalda:"espalda",hombro:"hombro",biceps:"bíceps",triceps:"tríceps",cuad:"pierna (cuádriceps)",gluteo:"glúteo",femoral:"femoral",pantorrilla:"pantorrilla",core:"abdomen",cardio:"cardio",equil:"equilibrio"};
 window.__th=id=>thumb(id);
 function exThumb(id){const i=EKIMG[id];return i?`<img src="${i[1]}" alt="" loading="lazy" onerror="this.outerHTML=__th('${id}')">`:thumb(id)}
 // Cambios de ejercicio guardados por usuario
@@ -736,8 +771,8 @@ function getSwaps(u){let a={},b={};try{a=JSON.parse((u||ME.user).cambios||"{}")}
 function setSwaps(o){ME.user.cambios=JSON.stringify(o);store.set("dojo_sw_"+ME.user.id,o);cacheMe();send("updateUser",{fields:{cambios:ME.user.cambios}})}
 function swapSheet(f,i){
  const p=dayPlan(f),r=p.x[i],orig=r[3]||r[0],g=r[4]||GRP[r[0]],u=ME.user;
- const avoid=new Set(cond(u).flatMap(c=>AVOID[c]||[])),inDay=new Set(p.x.map(z=>z[0]));
- const PL=POOL[p.lugar],opts=[...new Set([g,...(RELATED[g]||[])].flatMap(x=>PL[x]||[]))].filter(id=>id!==r[0]&&id!==orig&&!avoid.has(id)&&!inDay.has(id)).slice(0,3);
+ const avoid=avoidFor(u),inDay=new Set(p.x.map(z=>z[0]));
+ const PL=poolFor(u,p.lugar),opts=[...new Set([g,...(RELATED[g]||[])].flatMap(x=>PL[x]||[]))].filter(id=>id!==r[0]&&id!==orig&&!avoid.has(id)&&!inDay.has(id)).slice(0,3);
  openSheet(`<h3>🔄 Cambiar ${esc(EX[r[0]].n)}</h3><p class="note" style="margin:4px 0 12px">Opciones para ${GLBL[g]||g} (o músculos que trabajan junto con él) sin perder la estrategia del día. Tu elección se recordará en las siguientes rutinas.</p>
   ${opts.map(id=>`<div class="swo"><div class="thumb">${exThumb(id)}</div><div style="flex:1;min-width:0"><b>${EX[id].n}</b><div class="exm">${EX[id].m}</div></div><button class="btn sm" data-sw="${id}">Elegir</button></div>`).join("")||'<p class="note">No hay más opciones seguras para este ejercicio con tus cuidados de salud.</p>'}
   ${r[0]!==orig?`<button class="btn g w" style="margin-top:12px" data-sw="${orig}">↩️ Volver al original: ${EX[orig].n}</button>`:""}
@@ -783,7 +818,7 @@ POOL.gym={pecho:["maqpecho","inclinado","pecdeck","press","aperturas"],espalda:[
 const CP=n=>[`c${n}-1.webp`,`c${n}-2.webp`];
 Object.keys(EKIMG).forEach(k=>delete EKIMG[k]);
 Object.assign(EKIMG,{press:CP("0055"),hexpress:CP("0055"),pressfloor:CP("0070"),inclinado:CP("0061"),aperturas:CP("0056"),pecdeck:CP("0056"),lagartijas:CP("0077"),lagabiertas:CP("0077"),diamante:CP("0188"),maqpecho:CP("0066"),
- remo:CP("u435"),remo2:CP("u285"),renegado:CP("u553"),pullover:CP("0079"),superman:CP("0105"),posterior:CP("0032"),polea:CP("0096"),remosent:CP("0025"),
+ remo:CP("R285"),remo2:CP("0026"),renegado:CP("u553"),pullover:CP("0079"),superman:CP("0105"),posterior:CP("0032"),polea:CP("0096"),remosent:CP("0025"),
  curl:CP("0224"),martillo:CP("0227"),curlalt:CP("0223"),concentrado:CP("0220"),predicador:CP("0236"),curlinv:CP("0257"),frances:CP("0198"),patada:CP("0197"),patada1:CP("0196"),pushdown:CP("0205"),
  hombro:CP("0038"),arnold:CP("0038"),laterales:CP("0018"),frontal:CP("0033"),menton:CP("0016"),goblet:CP("0130"),pausa:CP("0130"),sumo:CP("0152"),zancada:CP("0115"),inversa:CP("0129"),bulgara:CP("0129"),
  stepup:CP("0137"),prensa:CP("0127"),extension:CP("0142"),puente:CP("0109"),puente1:CP("0109"),hipthrustg:CP("0109"),patadapolea:CP("0112"),
@@ -792,6 +827,19 @@ Object.assign(EKIMG,{press:CP("0055"),hexpress:CP("0055"),pressfloor:CP("0070"),
 
 const RELATED={femoral:["gluteo","cuad"],gluteo:["femoral","cuad"],cuad:["gluteo","femoral"],pantorrilla:["cuad"],cardio:["core"],core:["cardio"],
  pecho:["triceps","hombro"],espalda:["biceps","hombro"],hombro:["pecho","espalda"],biceps:["espalda"],triceps:["pecho"]};
+RELATED.equil=[];GRP.equilibrio="equil";GRP.talonpunta="equil";GRP.sillapie="cuad";GRP.caminata="cardio";
+Object.assign(TIMED,{equilibrio:"30s por lado",talonpunta:"1 min",caminata:"10 min"});ONE_SIDE.push("equilibrio");
+Object.assign(EX,{
+ sillapie:{n:"Sentarse y pararse de una silla",m:"Cuádriceps · Glúteo",f:"squat",acc:"🪑 Silla firme sin ruedas, pegada a la pared",
+  s:["Siéntate en la orilla de la silla, pies al ancho de cadera.","Inclina un poco el pecho al frente.","Levántate empujando con los talones, sin impulsarte con las manos si puedes.","Siéntate despacio, controlando la bajada."],t:"Es la base para conservar tu independencia. Si cuesta, ayúdate con las manos en los muslos; para hacerlo más difícil, sostén una mancuerna al pecho."},
+ equilibrio:{n:"Equilibrio en un pie con apoyo",m:"Equilibrio · Glúteo · Tobillo",f:"wallsit",acc:"🪑 Respaldo de una silla firme o pared",
+  s:["Párate derecho junto al respaldo de una silla y apóyate con una mano.","Levanta un pie unos centímetros del piso.","Mantén la posición con la mirada al frente.","Primero un lado completo y luego el otro."],t:"Cuando te sientas seguro, apóyate solo con un dedo o suelta la mano un momento. Ten siempre la silla al alcance."},
+ talonpunta:{n:"Caminata talón-punta",m:"Equilibrio · Core",f:"wallsit",acc:"🧱 Junto a una pared o barandal",
+  s:["Párate junto a una pared para poder apoyarte.","Da un paso poniendo el talón justo delante de la punta del otro pie.","Avanza despacio en línea recta, como sobre una cuerda.","Mira al frente, no a tus pies."],t:"Ejercicio clásico para prevenir caídas. Ve despacio y apóyate en la pared si lo necesitas."},
+ caminata:{n:"Caminata rápida o marcha en el lugar",m:"Cardio · Piernas",f:"wallsit",
+  s:["Camina a paso rápido, como si fueras tarde a una cita.","Si es en casa, marcha en el lugar subiendo las rodillas.","Mueve los brazos al ritmo de tus pasos.","Debes poder hablar, pero no cantar."],t:"Cuenta para tus minutos semanales de actividad (OMS: 150 o más)."}
+});
+Object.assign(MUS,{sillapie:{p:["cuadriceps","gluteo"],s:["abdomen"]},equilibrio:{p:["gluteo"],s:["pantorrilla","abdomen"]},talonpunta:{p:["pantorrilla","abdomen"],s:["gluteo"]},caminata:{p:["cuadriceps","pantorrilla"],s:["gluteo","femoral"]}});
 function swOk(pool,g,sw){return [g,...(RELATED[g]||[])].some(x=>(pool[x]||[]).includes(sw))}
 // ================== ESTADO ==================
 let ME=null;            // {user, pinHash}
@@ -1032,7 +1080,7 @@ function lastKg(id,before){
 
 // ================== TEMPORIZADOR ==================
 let rT=null,rLeft=0;
-function restSecs(){const u=ME.user,p=(+u.fase||0),mo=mainObj(u);let s=p===2||mo==="fuerza"?120:mo==="grasa"||mo==="resistencia"?45:mo==="musculo"?90:60;return caution(u)?s+30:s}
+function restSecs(){const u=ME.user,p=(+u.fase||0),mo=mainObj(u);let s=p===2||mo==="fuerza"?120:mo==="grasa"||mo==="resistencia"?45:mo==="musculo"?90:60;return caution(u)||ageG(u)==="mayor"?s+30:s}
 function beep(){try{const a=new(window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=880;o.connect(g);g.connect(a.destination);g.gain.value=.15;o.start();o.stop(a.currentTime+.4)}catch(e){}}
 function showRest(){$("rtm").textContent=Math.floor(Math.max(rLeft,0)/60)+":"+String(Math.max(rLeft,0)%60).padStart(2,"0");$("restbar").classList.toggle("end",rLeft<=0)}
 function startRest(){clearInterval(rT);rLeft=restSecs();$("restbar").classList.add("on");document.body.classList.add("resting");showRest();
@@ -1096,8 +1144,10 @@ function renderWorkout(){
  const rows=p.x.map((r,i)=>{const e=EX[r[0]],st=(s.detalle.sets[r[0]]||[]);tot+=r[1];ok+=st.slice(0,r[1]).filter(Boolean).length;
   const timed=/\ds|min|máx/.test(r[2]),lk=timed?null:lastKg(r[0],f),kg=s.detalle.kg[r[0]]||"";
   const side=ONE_SIDE.includes(r[0])?'<span class="sidetag">↔️ Un lado y luego el otro</span>':ALT_SIDE.includes(r[0])?'<span class="sidetag">↔️ Alternando lados</span>':"";
-  let sug="";if(lk){sug=lk.done>=lk.total?`⬆️ La vez pasada: ${lk.kg} kg completo → prueba ${(+lk.kg+(+lk.kg<10?1:2))} kg`:`↔️ La vez pasada: ${lk.kg} kg (${lk.done}/${lk.total} series) → repite el peso`}
   const noKg=timed||["bike","plank","climber","wallsit","pushup"].includes(e.f)||["lagartijas","diamante","superman","planchalat","puente1","kickback","crunch","elevpiernas","deadbug"].includes(r[0]);
+  const agw=ageG(u),soft=agw==="teen"||agw==="mayor";
+  let sug="";if(lk){sug=lk.done>=lk.total?`⬆️ La vez pasada: ${lk.kg} kg completo → prueba ${(+lk.kg+(soft||+lk.kg<10?1:2))} kg${soft?" solo si la técnica fue perfecta":""}`:`↔️ La vez pasada: ${lk.kg} kg (${lk.done}/${lk.total} series) → repite el peso`}
+  else if(!noKg&&soft)sug=agw==="teen"?"🔰 Empieza ligero: un peso con el que hagas 15 reps con técnica perfecta.":"🔰 Empieza ligero (1–3 kg) y sube solo cuando termines todas las series sin esfuerzo excesivo.";
   return `<div class="ex"><div class="exh"><div class="thumb" data-e="${r[0]}">${exThumb(r[0])}</div><div style="flex:1;min-width:0"><div class="exn" data-e="${r[0]}">${e.n}</div><div class="exm">${e.m}</div>
   <div class="rx"><b>${r[1]}</b> ${r[1]===1?"vez":"series"} × <b>${r[2]}</b>${timed||/por lado/.test(r[2])?"":" reps"}</div>${side}</div><button class="swapb" data-swap="${i}" title="Cambiar ejercicio">🔄</button></div>
   <div class="sets">${Array.from({length:r[1]},(_,k)=>`<button class="set ${st[k]?"done":""}" data-x="${r[0]}" data-k="${k}" ${future?"disabled":""}>${st[k]?"✓":k+1}</button>`).join("")}
@@ -1134,10 +1184,13 @@ function updProg(ok,tot){const pct=tot?Math.round(ok/tot*100):0;if($("wbar"))$("
 function openEx(id){
  const e=EX[id],q=encodeURIComponent(e.n+" técnica correcta"),img=EKIMG[id];
  openSheet(`<div class="dayh"><h3>${e.n}</h3><button class="btn g sm" onclick="closeSheet()">✕</button></div><div class="exm">${e.m}</div>${sideNote(id)}
- ${img?`<div class="ekfig"><img src="${img[0]}" alt="" onerror="this.closest('.ekfig').style.display='none'"><img src="${img[1]}" class="b" alt=""></div><p class="note" style="text-align:center;margin:-4px 0 4px;font-size:11px">🔴 Músculo que trabaja · Posición inicial ⇄ final · Ilustración: Everkinetic (CC BY-SA 4.0), coloreada por DojoApp</p>`:""}
+ ${img?`<div class="ekfig" onclick="this.classList.toggle('pause')"><div class="fr"><img src="${img[0]}" alt="" onerror="this.closest('.ekfig').style.display='none'"><span class="bdg">1 · Inicio</span></div><div class="fr b"><img src="${img[1]}" alt=""><span class="bdg">2 · Esfuerzo</span></div><span class="hint">Toca para pausar</span></div>
+ <div class="strip"><div><img src="${img[0]}" alt=""><small>1 · Inicio</small></div><b>➜</b><div><img src="${img[1]}" alt=""><small>2 · Esfuerzo</small></div></div>
+ <p class="note" style="text-align:center;margin:2px 0 4px;font-size:11px">🔴 Músculo que trabaja · Ilustración: Everkinetic (CC BY-SA 4.0), coloreada por DojoApp</p>`:""}
  ${anatomyCard(id)}
  <ol>${e.s.map(s=>`<li>${s}</li>`).join("")}</ol><div class="tip">💡 ${e.t}</div>
  ${(+ME.user.edad>=45||caution(ME.user))?'<div class="tip w">⚠️ Prioriza técnica y rango controlado sobre el peso; respira normal, no aguantes el aire.</div>':""}
+ ${ageG()==="teen"?'<div class="tip w">🧒 Aprende la técnica con poco peso. En el gym, con supervisión de un entrenador o adulto. Nada de levantar tu máximo.</div>':ageG()==="mayor"?'<div class="tip w">👵 Ten una silla o pared al alcance para apoyarte, muévete despacio y detente si sientes mareo o dolor en el pecho.</div>':""}
  <div class="row" style="margin-top:14px"><a class="btn" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">▶ Ver video</a><button class="btn g" onclick="closeSheet()">Cerrar</button></div>`);
 }
 
@@ -1219,7 +1272,10 @@ function nutrition(){
  const bmr=10*w+6.25*h-5*a+(u.sexo==="m"?-161:5),tdee=bmr*(1.3+trainDays(u).length*.05);
  let adj=o.includes("grasa")&&(o.includes("musculo")||o.includes("fuerza"))?-200:o.includes("grasa")?-450:(o.includes("musculo")||o.includes("fuerza"))?+300:o.includes("tono")?-200:0;
  if(c.includes("embarazo"))adj=0;
- const kcal=Math.round((tdee+adj)/50)*50,prot=Math.round(w*(o.includes("grasa")?2:(o.includes("musculo")||o.includes("fuerza"))?1.8:o.includes("tono")?1.6:1.4)),agua=(u.sexo==="m"?2.0:2.5).toFixed(1);
+ const ag=ageG(u);let pf=o.includes("grasa")?2:(o.includes("musculo")||o.includes("fuerza"))?1.8:o.includes("tono")?1.6:1.4;
+ if(ag==="teen"){adj=Math.max(0,Math.min(adj,200));pf=(o.includes("musculo")||o.includes("fuerza"))?1.5:1.3}
+ if(ag==="mayor"){adj=Math.max(adj,-250);pf=Math.min(1.5,Math.max(1.2,pf))}
+ const kcal=Math.round((tdee+adj)/50)*50,prot=Math.round(w*pf),agua=(u.sexo==="m"?2.0:2.5).toFixed(1);
  return {kcal,prot,agua,fat:Math.round(kcal*.27/9),carb:Math.max(0,Math.round((kcal-prot*4-kcal*.27)/4))};
 }
 function renderFood(){
@@ -1235,6 +1291,10 @@ function renderFood(){
  if(c.includes("cardiaco"))tips.push("❤️ Estilo mediterráneo: más pescado, aceite de oliva, nueces y verduras; menos frituras y grasa animal.");
  if(c.includes("embarazo"))tips.push("🤰 Tu alimentación en el embarazo debe indicarla tu médico; aquí no se aplica déficit de calorías.");
  if(pr.includes("vegano")||pr.includes("vegetariano"))tips.push("🌱 Combina leguminosas con cereales (frijol + tortilla, lentejas + arroz) para completar tu proteína.");
+ const ag=ageG(u);
+ if(ag==="teen")tips.unshift("🧒 Estás en crecimiento: aquí no se aplica déficit de calorías. Nada de dietas de hambre, ayunos ni suplementos (quemadores, creatina, proteína en polvo) sin indicación de un médico. Haz 3 comidas y 2 colaciones, incluye calcio (leche, yogurt, queso, tortilla de maíz) y duerme 8–10 horas. Platica tu plan con tus papás o tutor.");
+ if(ag==="mayor")tips.unshift("👵 Después de los 65 el músculo se pierde más fácil: pon proteína en cada comida (25–30 g: huevo, pescado, pollo, frijol, lácteos), incluye calcio y pregunta a tu médico por la vitamina D. Toma agua a horarios fijos aunque no tengas sed. Si tienes algún problema de riñón, que tu médico ajuste la proteína.");
+ if(ag==="50")tips.push("🦴 Después de los 50 cuida el calcio (lácteos, tortilla de maíz, sardina) y la proteína en cada comida para conservar músculo y hueso.");
  if(!tips.length)tips.push("Come variado, muchas verduras y agua natural. La constancia vale más que la perfección.");
  $("v-comida").innerHTML=`<div class="card"><div class="dayh"><h2>🥗 Tu plan de hoy</h2><span class="tag">${o.map(x=>OBJ[x]?OBJ[x][0]:"").join(" ")}</span></div>
  <div class="macro"><div><b style="color:var(--acc)">${n.kcal}</b><span>kcal / día</span></div><div><b style="color:var(--blue)">${n.prot} g</b><span>proteína</span></div><div><b style="color:#14b8a6">${n.agua} L</b><span>agua</span></div></div>
@@ -1373,7 +1433,7 @@ const HAB=[["agua","💧","Agua"],["pasos","🚶","7,000 pasos"],["prot","🍗",
 function renderHabits(){
  const k="dojo_hab_"+ME.user.id+"_"+todayISO(),h=store.get(k,{}),n=HAB.filter(x=>h[x[0]]).length,el=$("habits");if(!el)return;
  el.innerHTML=`<div class="dayh"><h2>✅ Hábitos de hoy</h2><span class="tag">${n}/${HAB.length}</span></div><p class="note" style="margin-bottom:8px">Basados en OMS, EFSA y AASM. El entrenamiento es la mitad; esto es la otra mitad.</p>
- <div class="row">${HAB.map(([id,e,l])=>`<button class="chip ${h[id]?"on":""}" data-h="${id}">${e} ${l}</button>`).join("")}</div>${n===HAB.length?'<p class="note" style="margin-top:8px;color:var(--ok)">🌟 ¡Día perfecto! Así se construye un cuerpo y una vida sana.</p>':""}`;
+ <div class="row">${HAB.map(([id,e,l])=>`<button class="chip ${h[id]?"on":""}" data-h="${id}">${e} ${id==="sueno"&&ageG()==="teen"?"Dormí 8 h o más":l}</button>`).join("")}</div>${n===HAB.length?'<p class="note" style="margin-top:8px;color:var(--ok)">🌟 ¡Día perfecto! Así se construye un cuerpo y una vida sana.</p>':""}`;
  el.querySelectorAll("[data-h]").forEach(b=>b.onclick=()=>{h[b.dataset.h]=!h[b.dataset.h];store.set(k,h);vib(8);renderHabits();if(HAB.every(x=>h[x[0]]))confetti()});
 }
 
@@ -1395,6 +1455,140 @@ function adminView(us){
  <p class="note" style="margin-top:10px">Todo el detalle (sesiones, pesos por ejercicio y medidas) está en tu Google Sheets.</p>`);
 }
 
+// ================== FRASE DEL DÍA ==================
+// 120 frases verificadas: 60 hombres y 60 mujeres, se alternan día con día (H, M, H, M...)
+const Q_H=[
+ ["Estás en peligro de vivir una vida tan cómoda y suave que morirás sin descubrir tu verdadero potencial.","David Goggins","Ex Navy SEAL y ultramaratonista · Can't Hurt Me"],
+ ["Un hombre debe mantenerse derecho, no ser mantenido derecho.","Marco Aurelio","Emperador romano y filósofo estoico · Meditaciones III, 5"],
+ ["Disciplina es igual a libertad.","Jocko Willink","Comandante retirado de los Navy SEAL"],
+ ["No es porque las cosas sean difíciles que no nos atrevemos; es porque no nos atrevemos que son difíciles.","Séneca","Filósofo estoico · Cartas a Lucilio, CIV"],
+ ["Solo los disciplinados son verdaderamente libres.","Eliud Kipchoge","Primer humano en correr un maratón en menos de 2 horas"],
+ ["Son las dificultades las que muestran lo que son los hombres.","Epicteto","Filósofo estoico que nació esclavo · Discursos"],
+ ["Odiaba cada minuto del entrenamiento, pero me dije: sufre ahora y vive el resto de tu vida como campeón.","Muhammad Ali","Tricampeón mundial de peso completo"],
+ ["No hay límites. Hay mesetas, pero no debes quedarte ahí: debes ir más allá.","Bruce Lee","Artista marcial · The Art of Expressing the Human Body"],
+ ["Si quieres ganar algo, corre 100 metros. Si quieres vivir algo, corre un maratón.","Emil Zátopek","Triple oro olímpico en Helsinki 1952"],
+ ["Fallar no es fatal, pero no cambiar podría serlo.","John Wooden","10 títulos de la NCAA como entrenador de UCLA"],
+ ["Quienes creen que no tienen tiempo para el ejercicio, tarde o temprano tendrán que encontrar tiempo para la enfermedad.","Edward Stanley, Conde de Derby","Discurso en Liverpool, 1873"],
+ ["Mucho mejor es atreverse a cosas grandes, aunque haya fracasos, que vivir en esa penumbra gris que no conoce ni victoria ni derrota.","Theodore Roosevelt","Discurso 'La vida extenuante', Chicago 1899"],
+ ["Dar menos que lo mejor de ti es sacrificar el don.","Steve Prefontaine","Fondista olímpico de EE.UU., Múnich 1972"],
+ ["La mayoría de la gente vive a cerca del 40% de su verdadera capacidad.","David Goggins","Récord mundial de dominadas en 24 horas · Can't Hurt Me"],
+ ["El arte de vivir se parece más a la lucha que a la danza: hay que estar listo y firme ante los golpes repentinos.","Marco Aurelio","Meditaciones VII, 61"],
+ ["Vamos a perseguir la perfección sin descanso, sabiendo que no la alcanzaremos. Pero en el camino atraparemos la excelencia.","Vince Lombardi","Primera junta como entrenador de Green Bay, 1959"],
+ ["Nadie es libre si es esclavo de su cuerpo.","Séneca","Cartas a Lucilio, XCII"],
+ ["Si te saltas un entrenamiento hoy, no hay forma de recuperarlo. Cuando lo dejas ir, se fue.","Jocko Willink","Comandante retirado de los Navy SEAL"],
+ ["Primero dite a ti mismo qué quieres ser; luego haz lo que tengas que hacer.","Epicteto","Discursos"],
+ ["Las batallas que cuentan no son las de las medallas de oro. Son las luchas dentro de ti, esas batallas invisibles e inevitables.","Jesse Owens","4 oros olímpicos en Berlín 1936"],
+ ["Da al menos un paso concreto cada día hacia tu meta.","Bruce Lee","Jeet Kune Do"],
+ ["Señores, hoy morimos un poco.","Emil Zátopek","Antes de ganar el maratón olímpico de Helsinki 1952, el primero de su vida"],
+ ["Haz de cada día tu obra maestra.","John Wooden","El consejo que le dio su padre"],
+ ["Si el ejercicio pudiera ponerse en una pastilla, sería la medicina más recetada y benéfica del país.","Dr. Robert N. Butler","Director fundador del Instituto Nacional del Envejecimiento de EE.UU."],
+ ["Es duro fallar, pero es peor nunca haber intentado triunfar. En esta vida no obtenemos nada sin esfuerzo.","Theodore Roosevelt","Chicago, 1899"],
+ ["He fallado más de 9,000 tiros. He perdido casi 300 partidos. 26 veces me confiaron el tiro ganador y fallé. He fracasado una y otra vez en mi vida. Por eso tengo éxito.","Michael Jordan","6 veces campeón de la NBA"],
+ ["No nos elevamos al nivel de nuestras expectativas. Caemos al nivel de nuestro entrenamiento.","David Goggins","Citando un dicho militar · Can't Hurt Me"],
+ ["Lo que te pasa no es una desgracia; soportarlo y salir adelante es una gran fortuna.","Marco Aurelio","Meditaciones IV, 49"],
+ ["No se trata de hacerlo bien de vez en cuando; se trata de hacerlo bien siempre.","Vince Lombardi","Leyenda de la NFL, 5 campeonatos con Green Bay"],
+ ["Empieza a vivir de una vez y cuenta cada día como una vida aparte.","Séneca","Cartas a Lucilio, CI"],
+ ["No sé dónde están los límites, pero me gustaría llegar ahí.","Eliud Kipchoge","Bicampeón olímpico de maratón"],
+ ["Nada grande se produce de golpe; ni siquiera la uva o el higo. Primero florece, luego da fruto y luego madura.","Epicteto","Discursos"],
+ ["La edad es lo que tú crees que es. Tienes la edad que crees tener.","Muhammad Ali","Revista Jet, 1992"],
+ ["No temo al hombre que ha practicado 10,000 patadas una vez; temo al que ha practicado una patada 10,000 veces.","Bruce Lee","Creador del Jeet Kune Do"],
+ ["¿Para qué practicar correr lento? Ya sé correr lento. Quiero aprender a correr rápido.","Emil Zátopek","La 'Locomotora Humana', Checoslovaquia"],
+ ["No te derrotes a ti mismo. Es la peor derrota que puedes sufrir.","John Wooden","Entrenador de basquetbol, UCLA"],
+ ["El ejercicio es, por mucho, el 'medicamento' más potente que existe para vivir más y mejor.","Dr. Peter Attia","Médico especialista en longevidad · Outlive"],
+ ["Por mucho, el mejor premio que ofrece la vida es la oportunidad de trabajar duro en algo que valga la pena.","Theodore Roosevelt","Presidente de EE.UU., 1903"],
+ ["Los límites, como los miedos, a menudo son solo una ilusión.","Michael Jordan","Discurso en el Salón de la Fama, 2009"],
+ ["La negación es la zona de confort definitiva.","David Goggins","Can't Hurt Me"],
+ ["Sufres con justicia: prefieres ser bueno mañana en vez de serlo hoy.","Marco Aurelio","Meditaciones VIII, 22"],
+ ["Ganar no lo es todo, pero el esfuerzo por ganar sí lo es.","Vince Lombardi","Vince Lombardi on Football, 1973"],
+ ["Para quien no sabe a qué puerto va, ningún viento es favorable.","Séneca","Cartas a Lucilio, LXXI"],
+ ["Odio hacer ejercicio. Dejar una cama calientita para ir a un gimnasio frío a las 5 de la mañana: eso es disciplina. Pero me gustan los resultados. Resultados, resultados, resultados.","Jack LaLanne","Padrino del fitness moderno, a los 90 años"],
+ ["Todo hábito y capacidad se mantiene y crece con sus propios actos: el de caminar, caminando; el de correr, corriendo.","Epicteto","Discursos II, 18"],
+ ["Es la falta de fe lo que hace que la gente tenga miedo de enfrentar retos. Y yo creo en mí.","Muhammad Ali","El más grande"],
+ ["Aprende a distinguir entre una catástrofe y una simple incomodidad.","Bruce Lee","Striking Thoughts"],
+ ["No intentes ser mejor que alguien más. Pero nunca dejes de intentar ser lo mejor que puedes ser: eso sí depende de ti.","John Wooden","Entrevista con Charlie Rose, 2000"],
+ ["Pasar de cero a solo 90 minutos de ejercicio a la semana puede reducir 14% tu riesgo de morir por cualquier causa.","Dr. Peter Attia","Outlive"],
+ ["Corramos el riesgo de desgastarnos antes que el de oxidarnos.","Theodore Roosevelt","Presidente, boxeador y explorador"],
+ ["No te enfoques en lo que crees que mereces. Apunta a lo que estás dispuesto a ganarte.","David Goggins","Can't Hurt Me"],
+ ["Que algo te cueste trabajo no significa que sea imposible para un ser humano; si es humanamente posible, también está a tu alcance.","Marco Aurelio","Meditaciones VI, 19"],
+ ["Gran parte del progreso es querer progresar.","Séneca","Cartas a Lucilio, LXXI"],
+ ["Todo en la vida es posible, y TÚ haces que suceda.","Jack LaLanne","Su mejor consejo, Denver Post 2003"],
+ ["No temas fallar. El crimen no es fallar, sino apuntar bajo. En los grandes intentos, hasta fallar es glorioso.","Bruce Lee","Striking Thoughts"],
+ ["La repetición, una y otra vez, hasta que se vuelve hábito y ya no tienes que pensarlo.","John Wooden","Su cuarta ley del aprendizaje"],
+ ["Corremos no solo porque nos hace bien, sino porque nos ayuda a hacer mejor todo lo demás.","Roger Bannister","Primera milla en menos de 4 minutos (1954) y neurólogo"],
+ ["En la vida, como en el futbol americano: golpea la línea con fuerza; no hagas trampa y no te escondas.","Theodore Roosevelt","The American Boy, 1900"],
+ ["Las conversaciones más importantes de tu vida son las que tienes contigo mismo.","David Goggins","Can't Hurt Me"],
+ ["¿Acaso somos fuertes solo para cargar pesos ligeros?","Séneca","Cartas a Lucilio, LXXVIII"]
+];
+const Q_M=[
+ ["Mis doctores me dijeron que nunca volvería a caminar. Mi mamá me dijo que sí. Le creí a mi mamá.","Wilma Rudolph","Tuvo polio de niña; triple oro olímpico en Roma 1960"],
+ ["Debes hacer lo que crees que no puedes hacer.","Eleanor Roosevelt","Activista y diplomática · You Learn by Living, 1960"],
+ ["La presión es un privilegio.","Billie Jean King","39 títulos de Grand Slam · Daily Express, 2008"],
+ ["No me reto a ser mejor que la persona de al lado, sino mejor que yo misma.","Sifan Hassan","Oro olímpico en 5,000 m, 10,000 m y maratón"],
+ ["La vida no es fácil para ninguno de nosotros. ¿Y qué? Hay que tener perseverancia y, sobre todo, confianza en uno mismo.","Marie Curie","Dos premios Nobel: Física y Química"],
+ ["Sabía que si renunciaba, nadie creería jamás que las mujeres eran capaces de correr más de 42 kilómetros.","Kathrine Switzer","Primera mujer en correr el Maratón de Boston con número oficial, 1967"],
+ ["La vida es una aventura atrevida, o no es nada.","Helen Keller","Escritora sorda y ciega · The Open Door, 1957"],
+ ["Quiero convencer a las mujeres de que busquen adquirir fuerza, tanto de la mente como del cuerpo.","Mary Wollstonecraft","Filósofa · Vindicación de los derechos de la mujer, 1792"],
+ ["Si alguna vez existiera una pastilla contra el envejecimiento, la llamaría ejercicio.","Ernestine Shepherd","Fisicoculturista récord Guinness; empezó a entrenar a los 56 años"],
+ ["El ejercicio es lo más transformador que puedes hacer hoy por tu cerebro.","Dra. Wendy Suzuki","Neurocientífica, Universidad de Nueva York · TED 2017"],
+ ["Nunca, jamás te rindas. Nunca eres demasiado mayor para perseguir tus sueños.","Diana Nyad","Nadó de Cuba a Florida a los 64 años, en su quinto intento (2013)"],
+ ["Cuidarme no es darme gusto: es preservarme.","Audre Lorde","Escritora y activista"],
+ ["La verdadera carrera empieza cuando empieza el dolor.","Sifan Hassan","Campeona del Maratón de Londres 2023"],
+ ["Ganas fuerza, valor y confianza cada vez que te detienes a mirar al miedo de frente.","Eleanor Roosevelt","You Learn by Living, 1960"],
+ ["Si aprendes del error, entonces no se puede llamar fracaso.","Lorena Ochoa","Número 1 del mundo en golf"],
+ ["Los sentimientos se desperdician en palabras; deben convertirse en acciones, y en acciones que den resultados.","Florence Nightingale","Pionera de la enfermería moderna y estadística"],
+ ["No solo somos atletas o entretenimiento: también somos humanos.","Simone Biles","La gimnasta más condecorada de la historia, Tokio 2021"],
+ ["Las mujeres no son hombres pequeños. Deja de comer y de entrenar como uno.","Dra. Stacy Sims","Fisióloga del ejercicio · ROAR, 2016"],
+ ["Uno nunca nota lo que ya hizo; solo ve lo que falta por hacer.","Marie Curie","Carta a su hermano, 1894"],
+ ["Los campeones se ajustan.","Billie Jean King","Leyenda del tenis"],
+ ["Aunque el mundo está lleno de sufrimiento, también está lleno de su superación.","Helen Keller","Optimism, 1903"],
+ ["Pasa de buscar la perfección a buscar el progreso.","Prof. Melody Ding","Universidad de Sídney · estudio de los 7,000 pasos, The Lancet 2025"],
+ ["En 1996 estaba lesionada, pero nunca me rendí. Creí que podía hacerlo.","Jackie Joyner-Kersee","Bronce olímpico en salto de longitud, Atlanta 1996"],
+ ["La atención es la forma más rara y más pura de generosidad.","Simone Weil","Filósofa francesa · Carta a Joë Bousquet, 1942"],
+ ["El ejercicio es como una dosis intravenosa de esperanza.","Dra. Kelly McGonigal","Psicóloga de la salud, Universidad de Stanford"],
+ ["Cuando siento ganas de rendirme o de llorar, no lo hago. Y el resultado es mucho más bonito.","Sifan Hassan","Fondista neerlandesa, 2023"],
+ ["Las mujeres dijeron 'sí podemos': tenemos que creer en nosotras.","Ana Gabriela Guevara","Campeona mundial de 400 m, París 2003"],
+ ["A la larga, damos forma a nuestra vida y nos damos forma a nosotros mismos. El proceso no termina hasta que morimos.","Eleanor Roosevelt","You Learn by Living, 1960"],
+ ["Quien dijo 'no importa si ganas o pierdes' probablemente perdió.","Martina Navratilova","18 títulos de Grand Slam · Newsweek, 1987"],
+ ["Cuando me atrevo a ser poderosa, a usar mi fuerza al servicio de lo que quiero, cada vez importa menos si tengo miedo.","Audre Lorde","The Cancer Journals, 1980"],
+ ["La edad no es más que un número. Solo necesitas ser decidida, dedicada y disciplinada.","Ernestine Shepherd","A los 74 años, entrevista con NPR (2011)"],
+ ["En la vida no hay nada que temer, solo hay que comprender.","Marie Curie","Pionera de la radiactividad"],
+ ["El optimismo es la fe que lleva al logro; nada se puede hacer sin esperanza.","Helen Keller","Optimism, 1903"],
+ ["Estoy orgullosa de cómo empujé hasta el final. Solo quería salir y hacerlo por mí. Y lo hice.","Simone Biles","Tras su bronce en viga, Tokio 2021"],
+ ["Meter el ejercicio en tu vida no solo te dará hoy una vida más feliz y productiva: protegerá tu cerebro y cambiará el rumbo de tu vida.","Dra. Wendy Suzuki","TED 2017"],
+ ["Siempre agradezco estar en la línea de salida y ver la meta, igual que los otros 30,000 corredores. Soy igual que ellos.","Shalane Flanagan","Medallista olímpica y fondista de EE.UU."],
+ ["Decidí ponerle un poco más de amplitud a cada elemento. Le llamo el 'toque Nadia'.","Nadia Comăneci","Primer 10 perfecto de la historia, Montreal 1976"],
+ ["Retarte es trabajo duro; está bien tener miedo y dudas. Solo no huyas ni renuncies.","Sifan Hassan","2023"],
+ ["Cuidar la salud debería significar el buen uso del aire fresco, la luz, el calor, la limpieza, la tranquilidad y una dieta bien elegida.","Florence Nightingale","Notes on Nursing, 1860"],
+ ["¿Cómo puede un ser racional engrandecerse con algo que no obtuvo con su propio esfuerzo?","Mary Wollstonecraft","Filósofa, 1792"],
+ ["Me enamoré de la idea de alimentar mi cuerpo de la mejor manera posible.","Venus Williams","7 títulos de Grand Slam · Revista Health, 2017"],
+ ["Si una voz en tu cabeza te dice que estás demasiado mayor, torpe o débil, lo que sientes al moverte puede ser un argumento contundente en contra.","Dra. Kelly McGonigal","The Joy of Movement, 2019"],
+ ["Me enseñaron que el camino del progreso no es rápido ni fácil.","Marie Curie","Primera persona con dos premios Nobel"],
+ ["La felicidad no es una meta: es una consecuencia.","Eleanor Roosevelt","You Learn by Living, 1960"],
+ ["Era una competidora feroz, siempre decidida. Encontré la forma de salir adelante cuando otros pensaban que sería demasiado.","Jackie Joyner-Kersee","Récord mundial de heptatlón desde 1988"],
+ ["Parece un deporte solitario, pero es un trabajo en equipo.","Diana Nyad","Al llegar a Key West tras 53 horas nadando"],
+ ["Tu influencia puede ser más grande de lo que imaginas y durar mucho más allá de tu última carrera.","Shelly-Ann Fraser-Pryce","5 veces campeona mundial de 100 m"],
+ ["No hay límites para los sueños.","Lorena Ochoa","27 victorias en la LPGA"],
+ ["Sobreexigirme no es lo mismo que estirarme.","Audre Lorde","Escritora y activista"],
+ ["Nunca subestimes la importancia que puedes tener: la historia demuestra que el valor es contagioso.","Michelle Obama","Impulsora de 'Let's Move' contra la obesidad infantil"],
+ ["Correr te enseña paciencia. Si no te rindes, simplemente sigues.","Sifan Hassan","Fondista neerlandesa"],
+ ["El mundo avanza no solo con los grandes empujones de sus héroes, sino con la suma de los pequeños empujones de cada persona que trabaja con honestidad.","Helen Keller","Optimism, 1903"],
+ ["Recomiendo comer nutritivo, entrenar y estar en tu mejor forma mental y física.","Martina Navratilova","9 veces campeona de Wimbledon"],
+ ["No puedes construir un mundo mejor sin mejorar a las personas. Cada quien debe trabajar en su propia mejora.","Marie Curie","Pierre Curie, 1923"],
+ ["Si suficientes personas llevan la mejor versión de sí mismas a su trabajo, su familia y su comunidad, llegaremos a un lugar mejor.","Shalane Flanagan","Women's Running, 2017"],
+ ["El propósito de la vida es vivirla, probar la experiencia al máximo y buscar sin miedo experiencias nuevas.","Eleanor Roosevelt","You Learn by Living, 1960"],
+ ["No tener alimento para la mente, para el corazón ni para nuestra actividad, ¿eso no es nada?","Florence Nightingale","Cassandra, 1860"],
+ ["Quería dejar huella más allá de correr rápido y saltar lejos.","Jackie Joyner-Kersee","3 oros olímpicos"],
+ ["La vida pasa muy rápido, y ahora la aprecio mucho más.","Simone Biles","Agosto de 2021"],
+ ["Esta noche agradezco haber podido pararme una vez más en una final de 100 metros.","Shelly-Ann Fraser-Pryce","Su última final mundial, 2025"]
+];
+const QUOTES=Q_H.flatMap((h,i)=>[h,Q_M[i]]);
+function showSplash(){
+ const d=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5),n=QUOTES.length,q=QUOTES[(d*37+Math.floor(d/n)*11)%n];
+ $("qt").textContent=q[0];$("qa").textContent="— "+q[1];$("qc").textContent=q[2];
+ const s=$("splash");let done=false;const go=()=>{if(done)return;done=true;s.classList.add("out");setTimeout(()=>s.remove(),500)};
+ s.onclick=go;setTimeout(go,7000);
+}
+showSplash();
 // ================== INICIO ==================
 loadPicker();
 if("serviceWorker" in navigator&&location.protocol==="https:"){try{navigator.serviceWorker.register("sw.js")}catch(e){}}
