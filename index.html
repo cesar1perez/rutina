@@ -124,6 +124,16 @@ details.info{background:var(--card2);border-radius:12px;padding:10px 12px;margin
 .meme{font-size:12px;color:#cfd5e1;font-style:italic;margin-top:4px;line-height:1.35}
 .dato{margin-top:10px;padding-top:9px;border-top:1px solid #2b3a55;font-size:12.5px;color:#b9c3d6;line-height:1.45}.dato b{color:#8fb4ff;font-size:11.5px}
 .sci a{color:var(--txt);text-decoration:none}.sci .lg span:first-child{color:var(--acc);font-weight:700;min-width:84px}
+body.resting{padding-bottom:220px}
+button,.set,.chip,.btn,.wd,.thumb{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.ekfig{position:relative;background:#fff;border-radius:14px;margin:12px 0;height:260px;overflow:hidden}
+.ekfig img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:10px}
+.ekfig img.b{animation:xf 2.6s ease-in-out infinite}@keyframes xf{0%,30%{opacity:0}50%,80%{opacity:1}100%{opacity:0}}
+.thumb img{width:100%;height:100%;object-fit:contain;background:#fff;padding:3px}
+.swapb{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:10px;width:40px;height:40px;font-size:17px;cursor:pointer;flex-shrink:0}
+.sidetag{display:inline-block;margin-top:5px;font-size:11.5px;font-weight:700;color:var(--warn);background:#2a1f0e;padding:3px 8px;border-radius:6px}
+.side{background:#2a1f0e;border-left:3px solid var(--warn);padding:8px 10px;border-radius:8px;font-size:13px;margin-top:10px}
+.swo{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
 .rest{text-align:center;padding:24px 10px;color:var(--mut)}
 .link{background:none;border:0;color:var(--mut);font:600 13px Inter;cursor:pointer;text-decoration:underline;margin-top:22px}
 </style>
@@ -370,11 +380,11 @@ function buildDay(u,slot,lugar){
  const used=new Set(),occ={},x=[];
  slots.forEach(g=>{
   const p=(pool[g]||[]).filter(id=>!avoid.has(id)&&!used.has(id));if(!p.length)return;
-  const k=(occ[g]=(occ[g]||0)+1)-1,id=p[(variant+(pi===1?1:0)+(k?0:0))%p.length];used.add(id);
-  let se=3,rp=TIMED[id]||(id==="lagartijas"?"máx":reps+(UNI.includes(id)?" c/l":""));
+  const k=(occ[g]=(occ[g]||0)+1)-1,orig=p[(variant+(pi===1?1:0))%p.length];let id=orig;const sw=getSwaps(u)[orig];if(sw&&EX[sw]&&(pool[g]||[]).includes(sw)&&!avoid.has(sw)&&!used.has(sw))id=sw;used.add(id);
+  let se=3,rp=TIMED[id]||(id==="lagartijas"?"máx":reps+(UNI.includes(id)?" por lado":""));
   if(id==="eliptica")se=1;
   else{if(fg.has(g))se++;se+=ph.plus||0;if(u.nivel==="principiante"&&pi===0)se=Math.max(2,se-1);if(u.nivel==="avanzado")se++;if(ph.half)se=Math.max(1,Math.ceil(se/2))}
-  x.push([id,se,rp]);
+  x.push([id,se,rp,orig,g]);
  });
  const cap=u.nivel==="avanzado"?8:7;
  while(x.length>cap){let i=-1;for(let j=x.length-1;j>=3;j--){if(!fg.has(GRP[x[j][0]])&&GRP[x[j][0]]!=="core"){i=j;break}}
@@ -645,6 +655,94 @@ function thumb(id){const m=MUS[id]||{p:[],s:[]},v=m.p.length&&m.p.every(x=>BACKV
  return anatomy(v,m.p,m.s,54,0,vb,54)}
 function paintThumbs(){}
 
+// ================== V5: casa solo con cuerpo/mancuernas, ilustraciones, cambios ==================
+Object.assign(EX,{
+ renegado:{n:"Remo renegado",m:"Espalda · Core · Bíceps",f:"pushup",
+  s:["Posición de lagartija con las manos sobre dos mancuernas, pies un poco abiertos.","Jala una mancuerna hacia la cadera sin girar el cuerpo.","Bájala y repite con el otro brazo. Cada lado cuenta como 1 repetición."],t:"Abdomen y glúteos apretados para que la cadera no se gire. Puedes apoyar rodillas para hacerlo más fácil."},
+ superman:{n:"Superman",m:"Lumbares · Glúteo · Espalda",f:"plank",
+  s:["Acuéstate boca abajo con brazos estirados al frente.","Levanta al mismo tiempo brazos, pecho y piernas unos centímetros.","Mantén 2 segundos arriba y baja lento."],t:"Movimiento corto y controlado; mira al piso para no forzar el cuello."},
+ hexpress:{n:"Press con mancuernas juntas",m:"Pecho interno · Tríceps",f:"press",
+  s:["Acostado en el piso (o banca en el gym), mancuernas juntas sobre el pecho.","Aprieta una mancuerna contra la otra todo el tiempo.","Empuja hacia arriba y baja lento sin separarlas."],t:"Apretar las mancuernas activa más el centro del pecho."},
+ arnold:{n:"Press de hombro de pie",m:"Hombros · Tríceps",f:"overhead",
+  s:["De pie, pies al ancho de cadera, mancuernas a la altura de los hombros.","Empuja hacia arriba hasta casi estirar los brazos.","Baja controlado a la altura de las orejas."],t:"Aprieta glúteos y abdomen para no arquear la espalda baja."},
+ diamante:{n:"Lagartijas cerradas (diamante)",m:"Tríceps · Pecho",f:"pushup",
+  s:["Posición de lagartija con las manos juntas debajo del pecho.","Baja con los codos pegados al cuerpo.","Empuja hasta estirar los brazos."],t:"Si cuesta mucho, apoya las rodillas en el piso."},
+ inversa:{n:"Zancada hacia atrás",m:"Glúteo · Cuádriceps",f:"lunge",
+  s:["De pie con mancuernas a los costados.","Da un paso largo hacia atrás y baja hasta que ambas rodillas formen 90°.","Empuja con el talón de adelante para regresar.","Termina todas las reps de una pierna y luego cambia."],t:"Es más amable con las rodillas que la zancada al frente."},
+ sumo:{n:"Sentadilla sumo con mancuerna",m:"Cuádriceps · Aductores · Glúteo",f:"squat",
+  s:["Pies más abiertos que los hombros y puntas hacia afuera.","Sostén una mancuerna con ambas manos entre las piernas.","Baja con el pecho arriba y las rodillas siguiendo las puntas.","Sube apretando glúteos."],t:"Trabaja más la parte interna del muslo y el glúteo."},
+ pausa:{n:"Sentadilla con pausa",m:"Cuádriceps · Glúteo",f:"squat",
+  s:["Mancuernas a los costados o una al pecho.","Baja a sentadilla y quédate 2 segundos abajo.","Sube con fuerza manteniendo el pecho arriba."],t:"La pausa hace el ejercicio más difícil sin necesitar más peso."},
+ puente1:{n:"Puente de glúteo a una pierna",m:"Glúteo · Femoral",f:"bridge",
+  s:["Boca arriba, una rodilla doblada y la otra pierna estirada al aire.","Empuja con el talón apoyado y sube la cadera.","Aprieta el glúteo arriba 1 segundo y baja.","Termina un lado y cambia."],t:"Mantén la cadera nivelada, sin que se caiga hacia un lado."},
+ pantorrilla1:{n:"Elevación de talón a una pierna",m:"Pantorrilla",f:"calf",
+  s:["De pie sobre una pierna, mancuerna en la mano del mismo lado.","Sube en punta lo más alto posible.","Baja lento y repite. Termina un lado y cambia."],t:"Para equilibrarte puedes tocar algo con la mano libre."},
+ planchalat:{n:"Plancha lateral",m:"Oblicuos · Core",f:"plank",
+  s:["De lado, apoyado en el antebrazo y el borde del pie.","Sube la cadera hasta formar una línea recta.","Mantén el tiempo indicado y cambia de lado."],t:"Si cuesta, apoya la rodilla de abajo."},
+ curlinv:{n:"Curl con agarre invertido",m:"Antebrazo · Bíceps",f:"curl",
+  s:["De pie, mancuernas con las palmas hacia abajo.","Sube doblando los codos sin moverlos de los costados.","Baja lento."],t:"Fortalece el antebrazo y el agarre."}
+});
+// Ajustes para hacerlos en casa sin muebles
+Object.assign(EX.remo,{n:"Remo a una mano",s:["Da un paso al frente y apoya la mano libre sobre tu rodilla, espalda recta.","Deja colgar la mancuerna del otro brazo.","Jala el codo hacia la cadera (no hacia el hombro).","Termina todas las reps de un lado y cambia."]});
+Object.assign(EX.concentrado,{s:["De pie, inclínate al frente y apoya la mano libre en tu rodilla.","Deja colgar la mancuerna del otro brazo.","Sube la mancuerna hacia el hombro sin mover el codo.","Termina un lado y cambia."]});
+Object.assign(EX.hombro,{n:"Press de hombro",s:["De pie o sentado, mancuernas a la altura de las orejas.","Empuja hacia arriba sin chocarlas.","Baja hasta la altura de la barbilla."]});
+Object.assign(EX.press,{n:"Press de pecho con mancuernas",s:["Acostado en el piso (o en banca si estás en el gym), una mancuerna en cada mano a la altura del pecho.","Codos a ~45° del cuerpo, no abiertos en cruz.","Empuja hacia arriba hasta casi estirar los brazos.","Baja lento (2–3 seg)."]});
+Object.assign(EX.aperturas,{s:["Acostado en el piso o banca, brazos arriba con codos ligeramente doblados.","Abre los brazos en arco hasta sentir el estiramiento en el pecho.","Regresa 'abrazando un barril' y aprieta el pecho arriba."]});
+Object.assign(EX.pullover,{s:["Acostado en el piso con rodillas dobladas, una mancuerna con ambas manos sobre el pecho.","Llévala hacia atrás de la cabeza con codos un poco doblados.","Regresa usando espalda y pecho."]});
+Object.assign(EX.pantorrilla,{s:["De pie con mancuernas a los costados, en el piso.","Sube en puntas lo más alto posible.","Baja lento."]});
+Object.assign(EX.plancha,{s:["Apoya antebrazos (o manos) y puntas de los pies.","Cuerpo recto de cabeza a talones.","Aprieta abdomen y glúteos y mantén."]});
+Object.assign(EX.kickback,{n:"Patada de glúteo de pie",acc:undefined,s:["De pie, manos en la cintura o al frente para equilibrarte.","Lleva una pierna hacia atrás con la rodilla casi estirada.","Aprieta el glúteo sin arquear la espalda y regresa.","Termina un lado y cambia."],t:"Movimiento corto y controlado; el que trabaja es el glúteo, no la espalda."});
+Object.assign(EX.patada,{s:["Inclínate al frente apoyando la mano libre en tu rodilla, codo pegado al costado a 90°.","Estira el brazo hacia atrás hasta quedar recto.","Aprieta 1 seg y regresa. Termina un lado y cambia."]});
+Object.assign(GRP,{renegado:"espalda",superman:"espalda",hexpress:"pecho",arnold:"hombro",diamante:"triceps",inversa:"cuad",sumo:"cuad",pausa:"cuad",puente1:"gluteo",pantorrilla1:"pantorrilla",planchalat:"core",curlinv:"biceps"});
+Object.assign(MUS,{renegado:{p:["dorsal"],s:["abdomen","biceps","deltoides"]},superman:{p:["lumbar","gluteo"],s:["dorsal","femoral"]},hexpress:{p:["pectoral","triceps"],s:["deltoides"]},
+ arnold:{p:["deltoides"],s:["triceps","trapecio"]},diamante:{p:["triceps","pectoral"],s:["deltoides"]},inversa:{p:["gluteo","cuadriceps"],s:["femoral","aductores"]},
+ sumo:{p:["cuadriceps","aductores","gluteo"],s:["femoral"]},pausa:{p:["cuadriceps","gluteo"],s:["abdomen"]},puente1:{p:["gluteo","femoral"],s:["lumbar"]},
+ pantorrilla1:{p:["pantorrilla"],s:[]},planchalat:{p:["oblicuos"],s:["abdomen","deltoides"]},curlinv:{p:["antebrazo","biceps"],s:[]}});
+// Grupos en casa: SOLO peso corporal o mancuernas
+POOL.casa={pecho:["press","lagartijas","aperturas","hexpress"],espalda:["remo","renegado","remo2","pullover","superman"],hombro:["hombro","laterales","arnold","posterior"],
+ biceps:["curl","martillo","concentrado","curlinv"],triceps:["frances","patada","diamante"],cuad:["goblet","inversa","zancada","sumo","pausa"],
+ gluteo:["puente","puente1","kickback"],femoral:["rdl","puente1","puente"],pantorrilla:["pantorrilla","pantorrilla1"],
+ core:["plancha","deadbug","crunch","climber","rusos","elevpiernas","planchalat"],cardio:["climber"]};
+POOL.gym={pecho:["maqpecho","inclinado","pecdeck","press","aperturas"],espalda:["polea","remosent","remo","pullover","remo2"],hombro:["hombro","laterales","posterior","arnold"],
+ biceps:["predicador","curl","martillo","concentrado"],triceps:["pushdown","frances","patada"],cuad:["prensa","extension","goblet","bulgara","zancada","stepup"],
+ gluteo:["hipthrustg","patadapolea","puente","kickback"],femoral:["femoral","rdl","puente1"],pantorrilla:["pantsent","pantorrilla"],core:["plancha","deadbug","crunch","climber","rusos"],cardio:["eliptica"]};
+Object.assign(TIMED,{planchalat:"30s por lado"});
+AVOID.lumbar.push("superman","renegado");AVOID.rodilla.push("inversa","sumo","pausa");AVOID.hombro.push("arnold","diamante");AVOID.muneca.push("renegado","diamante");
+AVOID.embarazo.push("superman","renegado","planchalat","hexpress");AVOID.osteoporosis.push("superman");
+// Ejercicios por lado
+const ONE_SIDE=["remo","concentrado","zancada","inversa","bulgara","stepup","kickback","patadapolea","puente1","pantorrilla1","planchalat"];
+const ALT_SIDE=["deadbug","renegado","climber","rusos"];
+UNI.length=0;UNI.push(...ONE_SIDE);
+function sideNote(id){
+ if(ONE_SIDE.includes(id))return `<div class="side">↔️ <b>Un lado a la vez:</b> haz todas las repeticiones con un lado y después con el otro. Las dos partes juntas cuentan como 1 serie.</div>`;
+ if(ALT_SIDE.includes(id))return `<div class="side">↔️ <b>Alternando lados:</b> derecha, izquierda, derecha… cada lado cuenta como 1 repetición.</div>`;
+ return "";
+}
+// Ilustraciones profesionales (Everkinetic, CC BY-SA 4.0) · [inicio, final]
+const EKP=(n,ext)=>[`ek/${n}-1.${ext||"svg"}`,`ek/${n}-2.${ext||"svg"}`];
+const EKIMG={press:EKP("0055"),hexpress:EKP("0055"),inclinado:EKP("0061"),aperturas:EKP("0056"),pecdeck:EKP("0056"),lagartijas:EKP("0077"),diamante:EKP("0188"),maqpecho:EKP("0066"),
+ remo:EKP("u435","webp"),remo2:EKP("u285","webp"),renegado:EKP("u553","webp"),pullover:EKP("0079"),superman:EKP("0105"),posterior:EKP("0032"),polea:EKP("0096"),remosent:EKP("0025"),
+ curl:EKP("0224"),martillo:EKP("0227"),concentrado:EKP("0220"),predicador:EKP("0236"),curlinv:EKP("0257"),frances:EKP("0198"),patada:EKP("0204"),pushdown:EKP("0205"),
+ hombro:EKP("0038"),arnold:EKP("0038"),laterales:EKP("0018"),goblet:EKP("0130"),pausa:EKP("0130"),sumo:EKP("0152"),zancada:EKP("0115"),inversa:EKP("0129"),bulgara:EKP("0129"),
+ stepup:EKP("0137"),prensa:EKP("0127"),extension:EKP("0142"),puente:EKP("0109"),puente1:EKP("0109"),hipthrustg:EKP("0109"),kickback:EKP("0111"),patadapolea:EKP("0112"),
+ rdl:EKP("0107"),femoral:EKP("0119"),pantorrilla:EKP("0275"),pantorrilla1:EKP("0275"),pantsent:EKP("0279"),plancha:["ek/0077-2.svg","ek/0077-2.svg"],planchalat:EKP("0113"),
+ crunch:EKP("0289"),rusos:EKP("u740","webp"),elevpiernas:EKP("0021"),climber:EKP("u554","webp")};
+const GLBL={pecho:"pecho",espalda:"espalda",hombro:"hombro",biceps:"bíceps",triceps:"tríceps",cuad:"pierna (cuádriceps)",gluteo:"glúteo",femoral:"femoral",pantorrilla:"pantorrilla",core:"abdomen",cardio:"cardio"};
+function exThumb(id){const i=EKIMG[id];return i?`<img src="${i[1]}" alt="" loading="lazy">`:thumb(id)}
+// Cambios de ejercicio guardados por usuario
+function getSwaps(u){let a={},b={};try{a=JSON.parse((u||ME.user).cambios||"{}")}catch(e){}b=store.get("dojo_sw_"+(u||ME.user).id,{});return {...a,...b}}
+function setSwaps(o){ME.user.cambios=JSON.stringify(o);store.set("dojo_sw_"+ME.user.id,o);cacheMe();send("updateUser",{fields:{cambios:ME.user.cambios}})}
+function swapSheet(f,i){
+ const p=dayPlan(f),r=p.x[i],orig=r[3]||r[0],g=r[4]||GRP[r[0]],u=ME.user;
+ const avoid=new Set(cond(u).flatMap(c=>AVOID[c]||[])),inDay=new Set(p.x.map(z=>z[0]));
+ const opts=(POOL[p.lugar][g]||[]).filter(id=>id!==r[0]&&!avoid.has(id)&&!inDay.has(id)).slice(0,3);
+ openSheet(`<h3>🔄 Cambiar ${esc(EX[r[0]].n)}</h3><p class="note" style="margin:4px 0 12px">Opciones que trabajan lo mismo (${GLBL[g]||g}) para no perder la estrategia del día. Tu elección se recordará en las siguientes rutinas.</p>
+  ${opts.map(id=>`<div class="swo"><div class="thumb">${exThumb(id)}</div><div style="flex:1;min-width:0"><b>${EX[id].n}</b><div class="exm">${EX[id].m}</div></div><button class="btn sm" data-sw="${id}">Elegir</button></div>`).join("")||'<p class="note">No hay más opciones seguras para este ejercicio con tus cuidados de salud.</p>'}
+  ${r[0]!==orig?`<button class="btn g w" style="margin-top:12px" data-sw="${orig}">↩️ Volver al original: ${EX[orig].n}</button>`:""}
+  <button class="btn g w" style="margin-top:10px" onclick="closeSheet()">Cancelar</button>`);
+ $("sheet").querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>{const s=getSwaps(),id=b.dataset.sw;if(id===orig)delete s[orig];else s[orig]=id;setSwaps(s);closeSheet();renderHero();renderWorkout();vib(10);toast(id===orig?"↩️ Ejercicio original restaurado":"✅ Cambiado. Se recordará en tus próximas rutinas")});
+}
+
 // ================== ESTADO ==================
 let ME=null;            // {user, pinHash}
 let SES={};             // fecha -> sesión
@@ -887,9 +985,9 @@ let rT=null,rLeft=0;
 function restSecs(){const u=ME.user,p=(+u.fase||0),mo=mainObj(u);let s=p===2||mo==="fuerza"?120:mo==="grasa"||mo==="resistencia"?45:mo==="musculo"?90:60;return caution(u)?s+30:s}
 function beep(){try{const a=new(window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=880;o.connect(g);g.connect(a.destination);g.gain.value=.15;o.start();o.stop(a.currentTime+.4)}catch(e){}}
 function showRest(){$("rtm").textContent=Math.floor(Math.max(rLeft,0)/60)+":"+String(Math.max(rLeft,0)%60).padStart(2,"0");$("restbar").classList.toggle("end",rLeft<=0)}
-function startRest(){clearInterval(rT);rLeft=restSecs();$("restbar").classList.add("on");showRest();
+function startRest(){clearInterval(rT);rLeft=restSecs();$("restbar").classList.add("on");document.body.classList.add("resting");showRest();
  rT=setInterval(()=>{rLeft--;showRest();if(rLeft===0){beep();vib([200,100,200])}if(rLeft<-20)stopRest()},1000)}
-function stopRest(){clearInterval(rT);$("restbar").classList.remove("on")}
+function stopRest(){clearInterval(rT);$("restbar").classList.remove("on");document.body.classList.remove("resting")}
 $("rm").onclick=()=>{rLeft=Math.max(0,rLeft-15);showRest()};$("rp").onclick=()=>{rLeft+=15;showRest()};$("rs").onclick=stopRest;
 
 // ================== NAVEGACIÓN ==================
@@ -945,42 +1043,52 @@ function renderWorkout(){
  const bindRec=()=>el.querySelectorAll("[data-rec]").forEach(b=>b.onclick=()=>{const s=ses(f);s.detalle.slot=+b.dataset.rec;s.detalle.override=1;vib(10);toast("✅ Rutina cambiada para hoy");persistDay(f,dayPlan(f));render()});
  if(p.rest){el.innerHTML=`${recoverBox(f,p)}<div class="rest"><div style="font-size:40px">😴</div><h2 style="color:var(--txt);margin:8px 0">Descanso</h2>Caminata ligera de 30 min y estiramientos.<br>Tomar agua y dormir 7–8 horas también es entrenar.</div>`;bindRec();return}
  const s=SES[f]||{detalle:{sets:{},kg:{}}};let ok=0,tot=0;const lug=p.lugar;
- const rows=p.x.map(r=>{const e=EX[r[0]],st=(s.detalle.sets[r[0]]||[]);tot+=r[1];ok+=st.slice(0,r[1]).filter(Boolean).length;
-  const timed=/s$|min|máx/.test(r[2]),lk=timed?null:lastKg(r[0],f),kg=s.detalle.kg[r[0]]||"";
+ const rows=p.x.map((r,i)=>{const e=EX[r[0]],st=(s.detalle.sets[r[0]]||[]);tot+=r[1];ok+=st.slice(0,r[1]).filter(Boolean).length;
+  const timed=/\ds|min|máx/.test(r[2]),lk=timed?null:lastKg(r[0],f),kg=s.detalle.kg[r[0]]||"";
+  const side=ONE_SIDE.includes(r[0])?'<span class="sidetag">↔️ Un lado y luego el otro</span>':ALT_SIDE.includes(r[0])?'<span class="sidetag">↔️ Alternando lados</span>':"";
   let sug="";if(lk){sug=lk.done>=lk.total?`⬆️ La vez pasada: ${lk.kg} kg completo → prueba ${(+lk.kg+(+lk.kg<10?1:2))} kg`:`↔️ La vez pasada: ${lk.kg} kg (${lk.done}/${lk.total} series) → repite el peso`}
-  return `<div class="ex"><div class="exh"><div class="thumb" data-e="${r[0]}">${thumb(r[0])}</div><div style="flex:1;min-width:0"><div class="exn" data-e="${r[0]}">${e.n}</div><div class="exm">${e.m}</div>
-  <div class="rx"><b>${r[1]}</b> ${r[1]===1?"vez":"series"} × <b>${r[2]}</b>${timed?"":" reps"}</div>${e.acc&&lug==="casa"?`<div class="exm" style="color:var(--blue)">${e.acc}</div>`:""}</div></div>
+  const noKg=timed||["bike","plank","climber","wallsit","pushup"].includes(e.f)||["lagartijas","diamante","superman","planchalat","puente1","kickback","crunch","elevpiernas","deadbug"].includes(r[0]);
+  return `<div class="ex"><div class="exh"><div class="thumb" data-e="${r[0]}">${exThumb(r[0])}</div><div style="flex:1;min-width:0"><div class="exn" data-e="${r[0]}">${e.n}</div><div class="exm">${e.m}</div>
+  <div class="rx"><b>${r[1]}</b> ${r[1]===1?"vez":"series"} × <b>${r[2]}</b>${timed||/por lado/.test(r[2])?"":" reps"}</div>${side}</div><button class="swapb" data-swap="${i}" title="Cambiar ejercicio">🔄</button></div>
   <div class="sets">${Array.from({length:r[1]},(_,k)=>`<button class="set ${st[k]?"done":""}" data-x="${r[0]}" data-k="${k}" ${future?"disabled":""}>${st[k]?"✓":k+1}</button>`).join("")}
-  ${timed||e.f==="bike"||e.f==="plank"||e.f==="climber"||e.f==="wallsit"?"":`<input class="kg" type="number" inputmode="decimal" placeholder="kg" value="${esc(kg)}" data-kg="${r[0]}" ${future?"disabled":""}>`}</div>
+  ${noKg?"":`<input class="kg" type="number" inputmode="decimal" placeholder="kg" value="${esc(kg)}" data-kg="${r[0]}" ${future?"disabled":""}>`}</div>
   ${sug?`<div class="sug">${sug}</div>`:""}</div>`}).join("");
  const pct=tot?Math.round(ok/tot*100):0,fin=list(u.objetivos||u.objetivo).includes("grasa")&&!caution(u)&&!p.x.some(r=>r[0]==="eliptica");
  const doneElse=isToday&&slotDone(weekStart(f),p.slot,f);
  el.innerHTML=`${recoverBox(f,p)}
  <div class="row" style="margin-bottom:12px"><button class="chip ${lug==="casa"?"on":""}" data-lug="casa">🏠 En casa</button><button class="chip ${lug==="gym"?"on":""}" data-lug="gym">🏢 En el gym</button></div>
  <div class="dayh"><h2>${p.t}</h2><span class="tag">${lug==="gym"?"GYM":"CASA"}</span></div>
- <details class="info" open><summary>🎯 Qué lograrás y por qué estos ejercicios</summary><p><b>Lograrás:</b> ${p.logro}</p>${p.why.map(w=>`<p>• ${w}</p>`).join("")}</details>
- <p class="note" style="margin:8px 0">🔥 <b style="color:var(--txt)">Calienta 5 min</b> y haz 1 serie ligera del primer ejercicio. 🎯 <b style="color:var(--txt)">Esfuerzo:</b> termina cada serie sintiendo que podías hacer 1–3 repeticiones más (no hace falta llegar al fallo, ACSM 2026).</p>
- ${lug==="casa"?'<p class="note" style="margin:8px 0">¿Sin mancuernas? Usa garrafones de agua, una mochila con libros o botellas llenas.</p>':""}
- ${fin?'<p class="note">➕ Al terminar: 12–15 min de caminata rápida o bici para quemar grasa.</p>':""}
+ <details class="info"><summary>🎯 Qué lograrás y por qué estos ejercicios</summary><p><b>Lograrás:</b> ${p.logro}</p>${p.why.map(w=>`<p>• ${w}</p>`).join("")}</details>
+ <p class="note" style="margin:8px 0">🔥 <b style="color:var(--txt)">Calienta 5 min</b> y haz 1 serie ligera del primer ejercicio. 🎯 <b style="color:var(--txt)">Esfuerzo:</b> termina cada serie sintiendo que podías hacer 1–3 repeticiones más (ACSM 2026).</p>
+ ${lug==="casa"?'<p class="note" style="margin:8px 0">🏠 En casa solo usas tu cuerpo y mancuernas. ¿Sin mancuernas? Garrafones de agua o una mochila con libros funcionan.</p>':""}
+ ${fin?'<p class="note">➕ Al terminar: 12–15 min de caminata rápida para quemar grasa.</p>':""}
  ${doneElse?'<p class="note" style="color:var(--ok)">✅ Ya completaste esta rutina esta semana. Hacerla otra vez suma extra.</p>':""}
  ${future?'<p class="note" style="color:var(--warn)">📅 Este día aún no llega. Puedes revisar los ejercicios.</p>':""}
- <div class="bar"><i style="width:${pct}%"></i></div><div class="note" style="margin-bottom:4px">${ok}/${tot} series · ${pct}% ${pct>=80?"🔥 ¡Día cumplido!":"· toca cada recuadro al terminar la serie"}</div>${rows}`;
- paintThumbs();bindRec();
+ <p class="note" style="margin:4px 0">🔄 ¿No te gusta un ejercicio? Toca 🔄 para cambiarlo.</p>
+ <div class="bar"><i id="wbar" style="width:${pct}%"></i></div><div class="note" id="wtxt" style="margin-bottom:4px"></div>${rows}`;
+ updProg(ok,tot);bindRec();
  el.querySelectorAll("[data-lug]").forEach(b=>b.onclick=()=>{const v=b.dataset.lug;if(SES[f])SES[f].detalle.lugar=v;else LUG[f]=v;vib(8);renderHero();renderWorkout()});
  el.querySelectorAll("[data-e]").forEach(n=>n.onclick=()=>openEx(n.dataset.e));
- el.querySelectorAll(".set").forEach(b=>b.onclick=()=>{
-  const S=ses(f),a=S.detalle.sets[b.dataset.x]=S.detalle.sets[b.dataset.x]||[];a[+b.dataset.k]=!a[+b.dataset.k];
-  if(a[+b.dataset.k]){startRest();vib(15)}persistDay(f,dayPlan(f));renderWorkout();renderHero();renderWeek();renderCoach()});
+ el.querySelectorAll("[data-swap]").forEach(b=>b.onclick=()=>swapSheet(f,+b.dataset.swap));
+ // Palomear serie: se actualiza solo ese botón (sin redibujar la pantalla)
+ el.querySelectorAll(".set").forEach(b=>b.onclick=e=>{
+  e.preventDefault();const S=ses(f),x=b.dataset.x,k=+b.dataset.k,a=S.detalle.sets[x]=S.detalle.sets[x]||[];a[k]=!a[k];
+  b.classList.toggle("done",!!a[k]);b.textContent=a[k]?"✓":k+1;
+  if(a[k]){startRest();vib(15)}
+  const pp=dayPlan(f);persistDay(f,pp);
+  let o2=0,t2=0;pp.x.forEach(r=>{t2+=r[1];o2+=(S.detalle.sets[r[0]]||[]).slice(0,r[1]).filter(Boolean).length});updProg(o2,t2);renderHero();renderWeek();
+ });
  el.querySelectorAll("[data-kg]").forEach(inp=>inp.onchange=()=>{const S=ses(f);S.detalle.kg[inp.dataset.kg]=inp.value;persistDay(f,dayPlan(f))});
 }
+function updProg(ok,tot){const pct=tot?Math.round(ok/tot*100):0;if($("wbar"))$("wbar").style.width=pct+"%";if($("wtxt"))$("wtxt").textContent=`${ok}/${tot} series · ${pct}% ${pct>=80?"🔥 ¡Día cumplido!":"· toca cada recuadro al terminar la serie"}`}
 function openEx(id){
- const e=EX[id],q=encodeURIComponent(e.n+" técnica correcta");
- openSheet(`<h3>${e.n}</h3><div class="exm">${e.m}</div>${e.acc?`<div class="exm" style="color:var(--blue);margin-top:4px">Necesitas: ${e.acc}</div>`:""}
- ${anatomyCard(id)}<div class="fig"><svg id="figsvg" viewBox="0 0 200 160" width="100%" style="max-width:360px;border-radius:10px"></svg></div><p class="note" style="text-align:center;margin-top:-6px">Así se mueve: el músculo en rojo se infla cuando trabaja</p>
+ const e=EX[id],q=encodeURIComponent(e.n+" técnica correcta"),img=EKIMG[id];
+ openSheet(`<div class="dayh"><h3>${e.n}</h3><button class="btn g sm" onclick="closeSheet()">✕</button></div><div class="exm">${e.m}</div>${sideNote(id)}
+ ${img?`<div class="ekfig"><img src="${img[0]}" alt=""><img src="${img[1]}" class="b" alt=""></div><p class="note" style="text-align:center;margin:-4px 0 4px;font-size:11px">Posición inicial ⇄ final · Ilustración: Everkinetic (CC BY-SA 4.0)</p>`:""}
+ ${anatomyCard(id)}
  <ol>${e.s.map(s=>`<li>${s}</li>`).join("")}</ol><div class="tip">💡 ${e.t}</div>
  ${(+ME.user.edad>=45||caution(ME.user))?'<div class="tip w">⚠️ Prioriza técnica y rango controlado sobre el peso; respira normal, no aguantes el aire.</div>':""}
  <div class="row" style="margin-top:14px"><a class="btn" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">▶ Ver video</a><button class="btn g" onclick="closeSheet()">Cerrar</button></div>`);
- startFig(id);
 }
 
 // ================== PROGRESO ==================
@@ -1185,6 +1293,7 @@ const SCI=[
  ["EFSA","Valores de referencia de agua (2.0 L mujeres · 2.5 L hombres)","https://www.efsa.europa.eu/en/press/news/nda100326"],
  ["AASM/SRS","Consenso: adultos, 7 o más horas de sueño","https://aasm.org/seven-or-more-hours-of-sleep-per-night-a-health-necessity-for-adults/"],
  ["Lancet 2025","Pasos diarios y salud: meta realista de 7,000 pasos","https://pubmed.ncbi.nlm.nih.gov/40713949/"],
+ ["Everkinetic","Ilustraciones de ejercicios (CC BY-SA 4.0)","https://github.com/everkinetic/data"],
  ["PAR-Q+","Cuestionario de aptitud para la actividad física","https://saludable.unizar.es/sites/saludable/files/users/deportes/pdf/parq.pdf"]
 ];
 const TIPS=[
