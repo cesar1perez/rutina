@@ -380,7 +380,7 @@ function buildDay(u,slot,lugar){
  const used=new Set(),occ={},x=[];
  slots.forEach(g=>{
   const p=(pool[g]||[]).filter(id=>!avoid.has(id)&&!used.has(id));if(!p.length)return;
-  const k=(occ[g]=(occ[g]||0)+1)-1,orig=p[(variant+(pi===1?1:0))%p.length];let id=orig;const sw=getSwaps(u)[orig];if(sw&&EX[sw]&&(pool[g]||[]).includes(sw)&&!avoid.has(sw)&&!used.has(sw))id=sw;used.add(id);
+  const k=(occ[g]=(occ[g]||0)+1)-1,orig=p[(variant+(pi===1?1:0))%p.length];let id=orig;const sw=getSwaps(u)[orig];if(sw&&EX[sw]&&swOk(pool,g,sw)&&!avoid.has(sw)&&!used.has(sw))id=sw;used.add(id);
   let se=3,rp=TIMED[id]||(id==="lagartijas"?"máx":reps+(UNI.includes(id)?" por lado":""));
   if(id==="eliptica")se=1;
   else{if(fg.has(g))se++;se+=ph.plus||0;if(u.nivel==="principiante"&&pi===0)se=Math.max(2,se-1);if(u.nivel==="avanzado")se++;if(ph.half)se=Math.max(1,Math.ceil(se/2))}
@@ -737,14 +737,62 @@ function setSwaps(o){ME.user.cambios=JSON.stringify(o);store.set("dojo_sw_"+ME.u
 function swapSheet(f,i){
  const p=dayPlan(f),r=p.x[i],orig=r[3]||r[0],g=r[4]||GRP[r[0]],u=ME.user;
  const avoid=new Set(cond(u).flatMap(c=>AVOID[c]||[])),inDay=new Set(p.x.map(z=>z[0]));
- const opts=(POOL[p.lugar][g]||[]).filter(id=>id!==r[0]&&!avoid.has(id)&&!inDay.has(id)).slice(0,3);
- openSheet(`<h3>🔄 Cambiar ${esc(EX[r[0]].n)}</h3><p class="note" style="margin:4px 0 12px">Opciones que trabajan lo mismo (${GLBL[g]||g}) para no perder la estrategia del día. Tu elección se recordará en las siguientes rutinas.</p>
+ const PL=POOL[p.lugar],opts=[...new Set([g,...(RELATED[g]||[])].flatMap(x=>PL[x]||[]))].filter(id=>id!==r[0]&&id!==orig&&!avoid.has(id)&&!inDay.has(id)).slice(0,3);
+ openSheet(`<h3>🔄 Cambiar ${esc(EX[r[0]].n)}</h3><p class="note" style="margin:4px 0 12px">Opciones para ${GLBL[g]||g} (o músculos que trabajan junto con él) sin perder la estrategia del día. Tu elección se recordará en las siguientes rutinas.</p>
   ${opts.map(id=>`<div class="swo"><div class="thumb">${exThumb(id)}</div><div style="flex:1;min-width:0"><b>${EX[id].n}</b><div class="exm">${EX[id].m}</div></div><button class="btn sm" data-sw="${id}">Elegir</button></div>`).join("")||'<p class="note">No hay más opciones seguras para este ejercicio con tus cuidados de salud.</p>'}
   ${r[0]!==orig?`<button class="btn g w" style="margin-top:12px" data-sw="${orig}">↩️ Volver al original: ${EX[orig].n}</button>`:""}
   <button class="btn g w" style="margin-top:10px" onclick="closeSheet()">Cancelar</button>`);
  $("sheet").querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>{const s=getSwaps(),id=b.dataset.sw;if(id===orig)delete s[orig];else s[orig]=id;setSwaps(s);closeSheet();renderHero();renderWorkout();vib(10);toast(id===orig?"↩️ Ejercicio original restaurado":"✅ Cambiado. Se recordará en tus próximas rutinas")});
 }
 
+// ================== V6: dibujos coloreados + casa sin bancos ==================
+Object.assign(EX,{
+ pressfloor:{n:"Press de pecho en el piso",m:"Pecho · Tríceps",f:"press",
+  s:["Acuéstate boca arriba en el piso con rodillas dobladas, una mancuerna en cada mano.","Codos apoyados en el piso a ~45° del cuerpo.","Empuja hacia arriba hasta casi estirar los brazos.","Baja lento hasta que los codos toquen suavemente el piso."],t:"El piso limita el recorrido y protege los hombros. Ideal en casa sin banco."},
+ lagabiertas:{n:"Lagartijas abiertas",m:"Pecho · Hombro",f:"pushup",
+  s:["Manos más abiertas que los hombros.","Cuerpo recto, abdomen apretado.","Baja hasta casi tocar el piso con el pecho y empuja."],t:"Con las manos abiertas trabaja más el pecho. Apoya rodillas si cuesta."},
+ frontal:{n:"Elevación frontal",m:"Hombro frontal",f:"lateral",
+  s:["De pie, mancuernas frente a los muslos.","Sube un brazo (o ambos) al frente hasta la altura del hombro.","Baja lento."],t:"Sin balancear el cuerpo; poco peso."},
+ menton:{n:"Remo al mentón",m:"Hombros · Trapecio",f:"overhead",
+  s:["De pie, mancuernas frente a los muslos.","Sube las mancuernas pegadas al cuerpo llevando los codos hacia afuera y arriba.","Detente cuando los codos lleguen a la altura de los hombros y baja lento."],t:"No subas más allá de los hombros para cuidarlos."},
+ curlalt:{n:"Curl alterno",m:"Bíceps",f:"curl",
+  s:["De pie, mancuernas a los costados.","Sube una mancuerna girando la palma hacia ti.","Baja y sube la otra."],t:"Cada brazo cuenta como una repetición; codos pegados al cuerpo."},
+ patada1:{n:"Extensión de tríceps a un brazo",m:"Tríceps",f:"kick",
+  s:["Inclínate al frente apoyando la mano libre en tu rodilla.","Codo pegado al costado y doblado.","Estira el brazo hacia atrás y regresa lento.","Termina un lado y cambia."],t:"Solo se mueve el antebrazo."},
+ revcrunch:{n:"Elevación de rodillas (crunch inverso)",m:"Abdomen bajo",f:"legraise",
+  s:["Boca arriba, brazos a los lados, rodillas dobladas.","Lleva las rodillas hacia el pecho despegando un poco la cadera.","Baja lento sin dejar caer las piernas."],t:"Movimiento controlado, sin impulso."},
+ drawin:{n:"Abdomen en cuatro puntos",m:"Core profundo · Protege la lumbar",f:"plank",
+  s:["En cuatro puntos: manos bajo hombros, rodillas bajo cadera, espalda neutra.","Exhala y mete el ombligo hacia la columna sin mover la espalda.","Mantén 10 segundos respirando y suelta."],t:"Fortalece el abdomen profundo que protege la espalda baja."}
+});
+Object.assign(EX.patada,{n:"Patada de tríceps de pie",s:["De pie, inclina el torso al frente con espalda recta y rodillas un poco dobladas.","Codos pegados al cuerpo y doblados a 90°.","Estira ambos brazos hacia atrás y aprieta 1 seg.","Regresa lento."]});
+Object.assign(GRP,{pressfloor:"pecho",lagabiertas:"pecho",frontal:"hombro",menton:"hombro",curlalt:"biceps",patada1:"triceps",revcrunch:"core",drawin:"core"});
+Object.assign(MUS,{pressfloor:{p:["pectoral"],s:["triceps","deltoides"]},lagabiertas:{p:["pectoral"],s:["deltoides","triceps"]},frontal:{p:["deltoides"],s:["pectoral"]},
+ menton:{p:["deltoides","trapecio"],s:["biceps"]},curlalt:{p:["biceps"],s:["antebrazo"]},patada1:{p:["triceps"],s:[]},revcrunch:{p:["abdomen"],s:["oblicuos"]},drawin:{p:["abdomen"],s:["oblicuos"]}});
+Object.assign(TIMED,{drawin:"10s × 6"});
+ONE_SIDE.push("patada1");UNI.push("patada1");ALT_SIDE.push("curlalt");
+AVOID.hombro.push("menton");AVOID.embarazo.push("pressfloor","revcrunch");AVOID.muneca.push("lagabiertas");
+// Casa: solo cuerpo y mancuernas, sin bancos ni muebles
+POOL.casa={pecho:["lagartijas","pressfloor","lagabiertas","diamante"],espalda:["remo","renegado","remo2","superman"],hombro:["hombro","laterales","frontal","menton","arnold"],
+ biceps:["curl","martillo","curlalt","curlinv"],triceps:["frances","patada","patada1","diamante"],cuad:["goblet","inversa","zancada","sumo","pausa"],
+ gluteo:["puente","puente1","sumo","inversa"],femoral:["rdl","puente1","puente"],pantorrilla:["pantorrilla","pantorrilla1"],
+ core:["plancha","revcrunch","crunch","climber","planchalat","drawin","rusos","elevpiernas"],cardio:["climber"]};
+POOL.gym={pecho:["maqpecho","inclinado","pecdeck","press","aperturas"],espalda:["polea","remosent","remo","pullover","remo2"],hombro:["hombro","laterales","posterior","frontal","menton"],
+ biceps:["predicador","curl","martillo","concentrado","curlalt"],triceps:["pushdown","frances","patada","patada1"],cuad:["prensa","extension","goblet","bulgara","zancada","stepup"],
+ gluteo:["hipthrustg","patadapolea","puente","puente1"],femoral:["femoral","rdl","puente1"],pantorrilla:["pantsent","pantorrilla"],core:["plancha","revcrunch","crunch","climber","planchalat","rusos"],cardio:["eliptica"]};
+// Dibujos con el músculo coloreado (en la raíz del repositorio)
+const CP=n=>[`c${n}-1.webp`,`c${n}-2.webp`];
+Object.keys(EKIMG).forEach(k=>delete EKIMG[k]);
+Object.assign(EKIMG,{press:CP("0055"),hexpress:CP("0055"),pressfloor:CP("0070"),inclinado:CP("0061"),aperturas:CP("0056"),pecdeck:CP("0056"),lagartijas:CP("0077"),lagabiertas:CP("0077"),diamante:CP("0188"),maqpecho:CP("0066"),
+ remo:CP("u435"),remo2:CP("u285"),renegado:CP("u553"),pullover:CP("0079"),superman:CP("0105"),posterior:CP("0032"),polea:CP("0096"),remosent:CP("0025"),
+ curl:CP("0224"),martillo:CP("0227"),curlalt:CP("0223"),concentrado:CP("0220"),predicador:CP("0236"),curlinv:CP("0257"),frances:CP("0198"),patada:CP("0197"),patada1:CP("0196"),pushdown:CP("0205"),
+ hombro:CP("0038"),arnold:CP("0038"),laterales:CP("0018"),frontal:CP("0033"),menton:CP("0016"),goblet:CP("0130"),pausa:CP("0130"),sumo:CP("0152"),zancada:CP("0115"),inversa:CP("0129"),bulgara:CP("0129"),
+ stepup:CP("0137"),prensa:CP("0127"),extension:CP("0142"),puente:CP("0109"),puente1:CP("0109"),hipthrustg:CP("0109"),patadapolea:CP("0112"),
+ rdl:CP("0107"),femoral:CP("0119"),pantsent:CP("0279"),plancha:["cplancha-1.webp","cplancha-1.webp"],planchalat:CP("0113"),
+ crunch:CP("0289"),rusos:CP("u740"),elevpiernas:CP("0021"),climber:CP("u554"),revcrunch:CP("0287"),drawin:CP("0027")});
+
+const RELATED={femoral:["gluteo","cuad"],gluteo:["femoral","cuad"],cuad:["gluteo","femoral"],pantorrilla:["cuad"],cardio:["core"],core:["cardio"],
+ pecho:["triceps","hombro"],espalda:["biceps","hombro"],hombro:["pecho","espalda"],biceps:["espalda"],triceps:["pecho"]};
+function swOk(pool,g,sw){return [g,...(RELATED[g]||[])].some(x=>(pool[x]||[]).includes(sw))}
 // ================== ESTADO ==================
 let ME=null;            // {user, pinHash}
 let SES={};             // fecha -> sesión
@@ -1086,7 +1134,7 @@ function updProg(ok,tot){const pct=tot?Math.round(ok/tot*100):0;if($("wbar"))$("
 function openEx(id){
  const e=EX[id],q=encodeURIComponent(e.n+" técnica correcta"),img=EKIMG[id];
  openSheet(`<div class="dayh"><h3>${e.n}</h3><button class="btn g sm" onclick="closeSheet()">✕</button></div><div class="exm">${e.m}</div>${sideNote(id)}
- ${img?`<div class="ekfig"><img src="${img[0]}" alt="" onerror="this.closest('.ekfig').style.display='none'"><img src="${img[1]}" class="b" alt=""></div><p class="note" style="text-align:center;margin:-4px 0 4px;font-size:11px">Posición inicial ⇄ final · Ilustración: Everkinetic (CC BY-SA 4.0)</p>`:""}
+ ${img?`<div class="ekfig"><img src="${img[0]}" alt="" onerror="this.closest('.ekfig').style.display='none'"><img src="${img[1]}" class="b" alt=""></div><p class="note" style="text-align:center;margin:-4px 0 4px;font-size:11px">🔴 Músculo que trabaja · Posición inicial ⇄ final · Ilustración: Everkinetic (CC BY-SA 4.0), coloreada por DojoApp</p>`:""}
  ${anatomyCard(id)}
  <ol>${e.s.map(s=>`<li>${s}</li>`).join("")}</ol><div class="tip">💡 ${e.t}</div>
  ${(+ME.user.edad>=45||caution(ME.user))?'<div class="tip w">⚠️ Prioriza técnica y rango controlado sobre el peso; respira normal, no aguantes el aire.</div>':""}
